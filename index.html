@@ -1,27 +1,295 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Figuras Flotantes</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="style.css">
+<title>Morphing Geométrico</title>
+
+<style>
+
+body{
+    margin:0;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:#f6dce6;
+}
+
+#container{
+
+    width:500px;
+    height:500px;
+
+    cursor:pointer;
+
+    animation:
+        float 8s ease-in-out infinite;
+}
+
+svg{
+    width:100%;
+    height:100%;
+}
+
+#shape{
+    fill:white;
+}
+
+@keyframes float{
+
+    0%{
+        transform:
+            translateY(0px)
+            rotate(0deg);
+    }
+
+    25%{
+        transform:
+            translateY(-8px)
+            rotate(-1deg);
+    }
+
+    50%{
+        transform:
+            translateY(5px)
+            rotate(1deg);
+    }
+
+    75%{
+        transform:
+            translateY(-5px)
+            rotate(-0.5deg);
+    }
+
+    100%{
+        transform:
+            translateY(0px)
+            rotate(0deg);
+    }
+
+}
+
+</style>
 </head>
 <body>
 
-    <div id="scene">
+<div id="container">
 
-        <!-- Figura inicial -->
+<svg viewBox="0 0 100 100">
 
-        <img
-            id="shape"
-            src="assets/figurassvg/figurasvg1.svg"
-            alt="Figura geométrica"
-        >
+    <polygon id="shape"></polygon>
 
-    </div>
+</svg>
 
-    <script src="script.js"></script>
+</div>
+
+<script>
+
+const shape = document.getElementById("shape");
+
+/*
+TODAS LAS FIGURAS TIENEN 8 PUNTOS
+
+Esto permite interpolar
+vértice por vértice.
+*/
+
+const formas = [
+
+/* 1 - Rectángulo largo */
+
+[
+ [10,40],
+ [90,40],
+ [90,40],
+ [90,40],
+
+ [90,60],
+ [10,60],
+ [10,60],
+ [10,60]
+],
+
+/* 2 - Rectángulo */
+
+[
+ [25,25],
+ [75,25],
+ [75,25],
+ [75,25],
+
+ [75,75],
+ [25,75],
+ [25,75],
+ [25,75]
+],
+
+/* 3 - Polígono con punta inferior */
+
+[
+ [25,20],
+ [75,20],
+ [75,65],
+ [60,80],
+
+ [50,90],
+ [40,80],
+ [25,65],
+ [25,20]
+],
+
+/* 4 - Hexágono */
+
+[
+ [30,15],
+ [70,15],
+ [90,50],
+ [70,85],
+
+ [30,85],
+ [10,50],
+ [10,50],
+ [30,15]
+]
+
+];
+
+let formaActual = 0;
+
+function actualizarSVG(puntos){
+
+    const texto = puntos
+        .map(p => `${p[0]},${p[1]}`)
+        .join(" ");
+
+    shape.setAttribute(
+        "points",
+        texto
+    );
+
+}
+
+actualizarSVG(
+    formas[0]
+);
+
+function interpolar(a,b,t){
+
+    return a + (b-a)*t;
+
+}
+
+function morph(indiceDestino){
+
+    const inicio =
+        formas[formaActual];
+
+    const destino =
+        formas[indiceDestino];
+
+    const duracion = 900;
+
+    let inicioTiempo = null;
+
+    function frame(tiempo){
+
+        if(!inicioTiempo)
+            inicioTiempo = tiempo;
+
+        let progreso =
+            (tiempo - inicioTiempo)
+            / duracion;
+
+        progreso =
+            Math.min(
+                progreso,
+                1
+            );
+
+        const eased =
+            0.5 -
+            Math.cos(
+                progreso*Math.PI
+            )/2;
+
+        const puntos = [];
+
+        for(
+            let i=0;
+            i<inicio.length;
+            i++
+        ){
+
+            puntos.push([
+
+                interpolar(
+                    inicio[i][0],
+                    destino[i][0],
+                    eased
+                ),
+
+                interpolar(
+                    inicio[i][1],
+                    destino[i][1],
+                    eased
+                )
+
+            ]);
+
+        }
+
+        actualizarSVG(
+            puntos
+        );
+
+        if(progreso < 1){
+
+            requestAnimationFrame(
+                frame
+            );
+
+        }
+
+    }
+
+    requestAnimationFrame(
+        frame
+    );
+
+    formaActual =
+        indiceDestino;
+
+}
+
+document
+.getElementById("container")
+.addEventListener(
+    "click",
+    ()=>{
+
+        let siguiente =
+            formaActual + 1;
+
+        if(
+            siguiente >= formas.length
+        ){
+            siguiente = 0;
+        }
+
+        morph(
+            siguiente
+        );
+
+    }
+);
+
+</script>
 
 </body>
-</html>
+</html> 
