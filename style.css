@@ -1,0 +1,77 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background: #f4bdbf;;
+}
+
+#scene{
+    cursor:pointer;
+}
+
+#shape{
+
+    width:350px;
+
+    animation: float 8s ease-in-out infinite;
+
+    transition:
+        transform 0.4s ease,
+        opacity 0.4s ease;
+
+}
+
+/* Estado de transformación */
+
+#shape.changing{
+
+    opacity:0.3;
+
+    transform:
+        scale(0.7)
+        rotate(20deg);
+
+}
+
+/* Flotación */
+
+@keyframes float{
+
+    0%{
+        translate:0px 0px;
+        rotate:0deg;
+    }
+
+    25%{
+        translate:0px -10px;
+        rotate:-1deg;
+    }
+
+    50%{
+        translate:0px 5px;
+        rotate:1deg;
+    }
+
+    75%{
+        translate:0px -6px;
+        rotate:-0.5deg;
+    }
+
+    100%{
+        translate:0px 0px;
+        rotate:0deg;
+    }
+
+}
