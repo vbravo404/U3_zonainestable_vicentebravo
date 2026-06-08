@@ -1,95 +1,304 @@
-const shape = document.getElementById("shape");
+const coloresFondo = [
 
-/*
-=========================================
-AGREGA AQUÍ TODAS TUS FIGURAS SVG
-=========================================
-*/
-
-const figuras = [
-
-    "assets/figurassvg/figurasvg1.svg",
-    "assets/figurassvg/figurasvg2.svg",
-    "assets/figurassvg/figurasvg3.svg",
-    "assets/figurassvg/figurasvg4.svg",
+    "#f4bdbf", // rosa pálido
+    "#c2e3e8", // azul pálido
+    "#efd978", // beige
+    "#8c2041"  // carmín
 
 ];
 
-/*
-=========================================
-FIN DE LA LISTA
-=========================================
-*/
+function cambiarColorFondo(indice){
 
-let indiceActual = 0;
+    document.body.style.backgroundColor =
+        coloresFondo[indice];
 
-shape.addEventListener("click", () => {
+}
 
-    shape.classList.add("changing");
-
-    setTimeout(() => {
-
-        indiceActual++;
-
-        if(indiceActual >= figuras.length){
-            indiceActual = 0;
-        }
-
-        shape.src = figuras[indiceActual];
-
-    }, 200);
-
-    setTimeout(() => {
-
-        shape.classList.remove("changing");
-
-    }, 400);
 const shape = document.getElementById("shape");
 
-/*
-=========================================
-AGREGA AQUÍ TODAS TUS FIGURAS SVG
-=========================================
-*/
+const formas = [
 
-const figuras = [
+/* 1 - Rectángulo largo */
 
-    "assets/figurassvg/figurasvg1.svg",
-    "assets/figurassvg/figurasvg2.svg",
-    "assets/figurassvg/figurasvg3.svg",
-    "assets/figurassvg/figurasvg4.svg",
+[
+    [10,40],
+    [90,40],
+    [90,40],
+    [90,40],
+
+    [90,60],
+    [10,60],
+    [10,60],
+    [10,60]
+],
+
+/* 2 - Rectángulo */
+
+[
+    [30,25],
+    [60,25],
+    [60,25],
+    [60,25],
+
+    [60,75],
+    [30,75],
+    [30,75],
+    [30,75]
+],
+
+/* 3 - Polígono con punta */
+
+[
+    [30,25],
+    [60,25],
+    [60,75],
+    [50,90],
+
+    [50,90],
+    [40,90],
+    [30,75],
+    [30,25]
+],
+
+/* 4 - Hexágono */
+
+[
+    [30,15],
+    [70,15],
+    [90,50],
+    [70,85],
+
+    [30,85],
+    [10,50],
+    [10,50],
+    [30,15]
+]
 
 ];
 
-/*
-=========================================
-FIN DE LA LISTA
-=========================================
-*/
+let formaActual = 0;
 
-let indiceActual = 0;
+function actualizarSVG(puntos){
 
-shape.addEventListener("click", () => {
+    const texto = puntos
+        .map(p => `${p[0]},${p[1]}`)
+        .join(" ");
 
-    shape.classList.add("changing");
+    shape.setAttribute(
+        "points",
+        texto
+    );
 
-    setTimeout(() => {
+    const pointsLayer =
+        document.getElementById("points");
 
-        indiceActual++;
+    pointsLayer.innerHTML = "";
 
-        if(indiceActual >= figuras.length){
-            indiceActual = 0;
+    /*
+    true  = mostrar vértices
+    false = ocultar vértices
+    */
+
+    const mostrarVertices = false;
+
+    if(!mostrarVertices){
+        return;
+    }
+
+    puntos.forEach((p,index)=>{
+
+        const circle =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle"
+            );
+
+        circle.setAttribute(
+            "cx",
+            p[0]
+        );
+
+        circle.setAttribute(
+            "cy",
+            p[1]
+        );
+
+        circle.setAttribute(
+            "r",
+            2
+        );
+
+        circle.setAttribute(
+            "fill",
+            "lime"
+        );
+
+        circle.setAttribute(
+            "stroke",
+            "black"
+        );
+
+        circle.setAttribute(
+            "stroke-width",
+            "0.3"
+        );
+
+        pointsLayer.appendChild(
+            circle
+        );
+
+        const label =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "text"
+            );
+
+        label.setAttribute(
+            "x",
+            p[0] + 2
+        );
+
+        label.setAttribute(
+            "y",
+            p[1] - 2
+        );
+
+        label.setAttribute(
+            "font-size",
+            "3"
+        );
+
+        label.setAttribute(
+            "fill",
+            "blue"
+        );
+
+        label.textContent =
+            index + 1;
+
+        pointsLayer.appendChild(
+            label
+        );
+
+    });
+
+}
+
+actualizarSVG(
+    formas[0]
+);
+
+function interpolar(a,b,t){
+
+    return a + (b-a)*t;
+
+}
+
+function morph(indiceDestino){
+
+    const inicio =
+        formas[formaActual];
+
+    const destino =
+        formas[indiceDestino];
+
+    const duracion = 900;
+
+    let inicioTiempo = null;
+
+    function frame(tiempo){
+
+        if(!inicioTiempo){
+            inicioTiempo = tiempo;
         }
 
-        shape.src = figuras[indiceActual];
+        let progreso =
+            (tiempo - inicioTiempo)
+            / duracion;
 
-    }, 200);
+        progreso =
+            Math.min(
+                progreso,
+                1
+            );
 
-    setTimeout(() => {
+        const eased =
+            0.5 -
+            Math.cos(
+                progreso * Math.PI
+            ) / 2;
 
-        shape.classList.remove("changing");
+        const puntos = [];
 
-    }, 400);
+        for(
+            let i = 0;
+            i < inicio.length;
+            i++
+        ){
 
->>>>>>> 110e5c7545351d662bb3bf72812350d62b132529
-});
+            puntos.push([
+
+                interpolar(
+                    inicio[i][0],
+                    destino[i][0],
+                    eased
+                ),
+
+                interpolar(
+                    inicio[i][1],
+                    destino[i][1],
+                    eased
+                )
+
+            ]);
+
+        }
+
+        actualizarSVG(
+            puntos
+        );
+
+        if(progreso < 1){
+
+            requestAnimationFrame(
+                frame
+            );
+
+        }
+
+    }
+
+    requestAnimationFrame(
+        frame
+    );
+
+    formaActual =
+        indiceDestino;
+
+}
+
+document
+.getElementById("container")
+.addEventListener(
+    "click",
+    () => {
+
+        let siguiente =
+            formaActual + 1;
+
+        if(
+            siguiente >= formas.length
+        ){
+            siguiente = 0;
+        }
+
+        morph(
+            siguiente
+        );
+
+        cambiarColorFondo(
+            siguiente
+        );
+
+    }
+);
