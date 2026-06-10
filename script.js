@@ -172,7 +172,10 @@ function morph(indiceDestino){
 
 }
 
-function crearPiezaMatter(){
+function crearPiezaMatter(
+    x,
+    y
+){
 
     const formaIndice =
         Math.floor(
@@ -191,49 +194,50 @@ function crearPiezaMatter(){
 
     switch(formaIndice){
 
-        case 0:
+        case 0: //pieza 1 - HEXÁGONO
 
-            vertices = [
-                {x:-96,y:-24},
-                {x:96,y:-24},
-                {x:96,y:24},
-                {x:-96,y:24}
+            vertices = [ 
+                {x:-120,y:0},
+                {x:-60,y:-105},
+                {x:60,y:-105},
+                {x:120,y:0},
+                {x:60,y:105},
+                {x:-60,y:105}
             ];
 
         break;
 
-        case 1:
+        case 1: //pieza 2 - NORMAL (RECTÁNGULO)
 
-            vertices = [
-                {x:-36,y:-90},
-                {x:36,y:-90},
-                {x:36,y:90},
-                {x:-36,y:90}
+            vertices = [ 
+                {x:-45,y:-90},
+                {x:45,y:-90},
+                {x:45,y:90},
+                {x:-45,y:90}
             ];
 
         break;
 
-        case 2:
+        case 2: //pieza 3 - ESPECIAL (RECTÁNGULO CON PUNTA)
 
             vertices = [
-                {x:-40,y:-70},
-                {x:40,y:-70},
-                {x:40,y:20},
-                {x:0,y:90},
-                {x:-40,y:20}
+                {x:-45,y:-40},
+                {x:-18,y:-90},
+                {x:18,y:-90},
+                {x:45,y:-40},
+                {x:45,y:90},
+                {x:-45,y:90}
             ];
 
         break;
 
-        default:
+        default: //pieza 4 - PILAR
 
-            vertices = [
-                {x:-60,y:-45},
-                {x:0,y:-90},
-                {x:60,y:-45},
-                {x:60,y:45},
-                {x:0,y:90},
-                {x:-60,y:45}
+            vertices = [ 
+                {x:-35,y:-140},
+                {x:35,y:-140},
+                {x:35,y:140},
+                {x:-35,y:140}
             ];
 
     }
@@ -241,21 +245,18 @@ function crearPiezaMatter(){
     let pieza =
         Bodies.fromVertices(
 
-            Math.random() *
-            window.innerWidth,
-
-            Math.random() *
-            window.innerHeight,
+            x,
+            y,
 
             [vertices],
 
             {
 
-                restitution:1,
+                restitution:0.95,
 
                 friction:0,
 
-                frictionAir:0,
+                frictionAir:0.002,
 
                 render:{
                     fillStyle:color
@@ -414,39 +415,79 @@ function iniciarMatter(){
     );
 
     let ultimoSpawn = 0;
+    const intervaloSpawn = 250;
 
     Events.on(
     engine,
     "collisionStart",
-    ()=>{
+    (event)=>{
 
-        const ahora =
-            Date.now();
+        const ahora = Date.now();
 
         if(
-            ahora -
-            ultimoSpawn <
-            400
+            ahora - ultimoSpawn <
+            intervaloSpawn
         ){
             return;
         }
 
-        ultimoSpawn =
-            ahora;
+        event.pairs.forEach(pair=>{
 
-        const cuerpos =
-            Composite.allBodies(
-                physicsWorld
-            );
+            const a = pair.bodyA;
+            const b = pair.bodyB;
 
-        if(
-            cuerpos.length < 30
-        ){
-            crearPiezaMatter();
-        }
+            // Ignorar paredes
+
+            if(
+                a.isStatic ||
+                b.isStatic
+            ){
+                return;
+            }
+
+            const puntoColision = {
+
+                x:
+                    pair.collision.supports[0].x,
+
+                y:
+                    pair.collision.supports[0].y
+
+            };
+
+            const cuerposDinamicos =
+
+                Composite.allBodies(
+                    physicsWorld
+                ).filter(
+                    body => !body.isStatic
+                );
+
+            // nuevo límite mucho más alto
+
+            if(
+                cuerposDinamicos.length < 500
+            ){
+
+                ultimoSpawn = ahora;
+
+                crearPiezaMatter(
+
+                    puntoColision.x +
+                    (Math.random()-0.5)*40,
+
+                    puntoColision.y +
+                    (Math.random()-0.5)*40
+
+    );
+
+}
+
+        });
 
     }
 );
+
 }
 
 function activarModoFinal(){
@@ -461,9 +502,16 @@ function activarModoFinal(){
 
     iniciarMatter();
 
-    crearPiezaMatter();
+    crearPiezaMatter(
+        window.innerWidth * 0.4,
+        window.innerHeight * 0.5
+    );
 
-    crearPiezaMatter();
+    crearPiezaMatter(
+        window.innerWidth * 0.6,
+        window.innerHeight * 0.5
+    );
+
 }
 
 container.addEventListener(
@@ -499,4 +547,3 @@ container.addEventListener(
 
     }
 );
-
