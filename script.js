@@ -172,214 +172,282 @@ function morph(indiceDestino){
 
 }
 
-function crearPieza(){
+function crearPiezaMatter(){
 
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.className =
-        "pieza";
-
-    let formaIndice =
+    const formaIndice =
         Math.floor(
-            Math.random()*formas.length
+            Math.random() * 4
         );
 
-    let color =
+    const color =
         coloresPiezas[
             Math.floor(
-                Math.random()*
+                Math.random() *
                 coloresPiezas.length
             )
         ];
 
-    const puntos =
-        formas[formaIndice]
-        .map(
-            p =>
-            `${p[0]},${p[1]}`
-        )
-        .join(" ");
+    let vertices;
 
-    div.innerHTML = `
+    switch(formaIndice){
 
-        <svg viewBox="0 0 100 100">
+        case 0:
 
-            <polygon
-                points="${puntos}"
-                fill="${color}">
-            </polygon>
+            vertices = [
+                {x:-96,y:-24},
+                {x:96,y:-24},
+                {x:96,y:24},
+                {x:-96,y:24}
+            ];
 
-        </svg>
+        break;
 
-    `;
+        case 1:
 
-    world.appendChild(
-        div
+            vertices = [
+                {x:-36,y:-90},
+                {x:36,y:-90},
+                {x:36,y:90},
+                {x:-36,y:90}
+            ];
+
+        break;
+
+        case 2:
+
+            vertices = [
+                {x:-40,y:-70},
+                {x:40,y:-70},
+                {x:40,y:20},
+                {x:0,y:90},
+                {x:-40,y:20}
+            ];
+
+        break;
+
+        default:
+
+            vertices = [
+                {x:-60,y:-45},
+                {x:0,y:-90},
+                {x:60,y:-45},
+                {x:60,y:45},
+                {x:0,y:90},
+                {x:-60,y:45}
+            ];
+
+    }
+
+    let pieza =
+        Bodies.fromVertices(
+
+            Math.random() *
+            window.innerWidth,
+
+            Math.random() *
+            window.innerHeight,
+
+            [vertices],
+
+            {
+
+                restitution:1,
+
+                friction:0,
+
+                frictionAir:0,
+
+                render:{
+                    fillStyle:color
+                }
+
+            },
+
+            true
+
+        );
+
+    if(
+        Array.isArray(pieza)
+    ){
+        pieza = pieza[0];
+    }
+
+    Composite.add(
+        physicsWorld,
+        pieza
     );
 
-    let x =
-        Math.random() *
-        (window.innerWidth-200);
+    Body.setVelocity(
+        pieza,
+        {
 
-    let y =
-        Math.random() *
-        (window.innerHeight-200);
+            x:
+                (Math.random()-0.5)
+                * 12,
 
-    let vx =
-        (Math.random()-0.5)
-        *1.2;
-
-    let vy =
-        (Math.random()-0.5)
-        *1.2;
-
-    let dragging =
-        false;
-
-    div.style.left =
-        x + "px";
-
-    div.style.top =
-        y + "px";
-
-    div.addEventListener(
-        "pointerdown",
-        ()=>{
-
-            dragging = true;
+            y:
+                (Math.random()-0.5)
+                * 12
 
         }
     );
 
-    window.addEventListener(
-        "pointerup",
-        ()=>{
+    return pieza;
+}
 
-            dragging = false;
+// =====================
+// MATTER
+// =====================
 
-        }
+const Engine = Matter.Engine;
+const Render = Matter.Render;
+const Runner = Matter.Runner;
+const Bodies = Matter.Bodies;
+const Body = Matter.Body;
+const Composite = Matter.Composite;
+const Mouse = Matter.Mouse;
+const MouseConstraint = Matter.MouseConstraint;
+const Events = Matter.Events;
+
+let engine = null;
+let physicsWorld = null;
+
+function iniciarMatter(){
+
+    engine =
+        Engine.create();
+
+    engine.gravity.y = 0;
+
+    physicsWorld =
+        engine.world;
+
+    const render =
+        Render.create({
+
+            element: world,
+
+            engine,
+
+            options:{
+
+                width:
+                    window.innerWidth,
+
+                height:
+                    window.innerHeight,
+
+                wireframes:false,
+
+                background:"transparent"
+
+            }
+
+        });
+
+    Render.run(render);
+
+    const runner =
+        Runner.create();
+
+    Runner.run(
+        runner,
+        engine
     );
 
-    let ultimoMouseX = 0;
-let ultimoMouseY = 0;
+    Composite.add(
+        physicsWorld,
+        [
 
-window.addEventListener(
-    "pointermove",
-    e=>{
+            Bodies.rectangle(
+                window.innerWidth/2,
+                -30,
+                window.innerWidth,
+                60,
+                {isStatic:true}
+            ),
+
+            Bodies.rectangle(
+                window.innerWidth/2,
+                window.innerHeight+30,
+                window.innerWidth,
+                60,
+                {isStatic:true}
+            ),
+
+            Bodies.rectangle(
+                -30,
+                window.innerHeight/2,
+                60,
+                window.innerHeight,
+                {isStatic:true}
+            ),
+
+            Bodies.rectangle(
+                window.innerWidth+30,
+                window.innerHeight/2,
+                60,
+                window.innerHeight,
+                {isStatic:true}
+            )
+
+        ]
+    );
+
+    const mouse =
+        Mouse.create(
+            render.canvas
+        );
+
+    const mouseConstraint =
+        MouseConstraint.create(
+            engine,
+            {
+                mouse
+            }
+        );
+
+    Composite.add(
+        physicsWorld,
+        mouseConstraint
+    );
+
+    let ultimoSpawn = 0;
+
+    Events.on(
+    engine,
+    "collisionStart",
+    ()=>{
+
+        const ahora =
+            Date.now();
 
         if(
-            dragging
+            ahora -
+            ultimoSpawn <
+            400
         ){
+            return;
+        }
 
-            const nuevoX =
-                e.clientX - 90;
+        ultimoSpawn =
+            ahora;
 
-            const nuevoY =
-                e.clientY - 90;
+        const cuerpos =
+            Composite.allBodies(
+                physicsWorld
+            );
 
-            // VELOCIDAD GENERADA
-            // POR EL MOVIMIENTO DEL MOUSE
-
-            vx =
-                nuevoX - x;
-
-            vy =
-                nuevoY - y;
-
-            x =
-                nuevoX;
-
-            y =
-                nuevoY;
-
-            div.style.left =
-                x + "px";
-
-            div.style.top =
-                y + "px";
-
-            ultimoMouseX =
-                e.clientX;
-
-            ultimoMouseY =
-                e.clientY;
-
+        if(
+            cuerpos.length < 30
+        ){
+            crearPiezaMatter();
         }
 
     }
 );
-
-    function mover(){
-
-        if(
-            !dragging
-        ){
-
-            x += vx;
-            y += vy;
-
-        }
-
-        if(
-            x <= 0 ||
-            x >=
-            window.innerWidth
-            -180
-        ){
-
-            vx *= -1;
-
-        }
-
-        if(
-            y <= 0 ||
-            y >=
-            window.innerHeight
-            -180
-        ){
-
-            vy *= -1;
-
-        }
-
-        div.style.left =
-            x + "px";
-
-        div.style.top =
-            y + "px";
-
-        requestAnimationFrame(
-            mover
-        );
-
-    }
-
-    mover();
-
-    return {
-
-        element:div,
-
-        getX:()=>x,
-
-        getY:()=>y,
-
-        setVX:v=>vx=v,
-
-        setVY:v=>vy=v,
-
-        getVX:()=>vx,
-
-        getVY:()=>vy
-
-    };
-
 }
-
-const piezas = [];
 
 function activarModoFinal(){
 
@@ -391,72 +459,11 @@ function activarModoFinal(){
     container.style.display =
         "none";
 
-    piezas.push(
-        crearPieza()
-    );
+    iniciarMatter();
 
-    piezas.push(
-        crearPieza()
-    );
+    crearPiezaMatter();
 
-    setInterval(()=>{
-
-        if(
-            piezas.length < 2
-        ){
-            return;
-        }
-
-        const a =
-            piezas[0];
-
-        const b =
-            piezas[1];
-
-        const dx =
-            a.getX()
-            - b.getX();
-
-        const dy =
-            a.getY()
-            - b.getY();
-
-        const distancia =
-            Math.sqrt(
-                dx*dx +
-                dy*dy
-            );
-
-        if(
-            distancia < 80
-        ){
-
-            const avx =
-                a.getVX();
-
-            const avy =
-                a.getVY();
-
-            a.setVX(
-                b.getVX()
-            );
-
-            a.setVY(
-                b.getVY()
-            );
-
-            b.setVX(
-                avx
-            );
-
-            b.setVY(
-                avy
-            );
-
-        }
-
-    },8);
-
+    crearPiezaMatter();
 }
 
 container.addEventListener(
@@ -492,3 +499,4 @@ container.addEventListener(
 
     }
 );
+
