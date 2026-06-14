@@ -327,7 +327,7 @@ function controlarLogo(){
 
     const limite =
 
-        hero.offsetHeight - 150;
+        hero.offsetHeight * 0.5;
 
     if(
         window.scrollY > limite
