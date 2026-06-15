@@ -10,9 +10,23 @@
 
 <link rel="stylesheet" href="style.css">
 
+<script
+type="module"
+src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
+</script>
+
 </head>
 
 <body>
+    
+    <div id="escena3d">
+
+    <model-viewer
+        src="modelos/bola.glb"
+        disable-zoom>
+    </model-viewer>
+
+</div>
 
 <div id="container">
 
@@ -30,5 +44,6 @@
 <script src="script.js"></script>
 
 </body>
+
 
 </html>

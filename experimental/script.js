@@ -314,6 +314,31 @@ const Events = Matter.Events;
 let engine = null;
 let physicsWorld = null;
 
+let bolaCreada = false;
+let bola3D = null;
+
+const piezasDestruyendose = new Set();
+let faseSiguienteIniciada = false; 
+
+let mouseX =
+    window.innerWidth / 2;
+
+let mouseY =
+    window.innerHeight / 2;
+
+window.addEventListener(
+    "mousemove",
+    (e)=>{
+
+        mouseX =
+            e.clientX;
+
+        mouseY =
+            e.clientY;
+
+    }
+);
+
 function iniciarMatter(){
 
     engine =
@@ -355,6 +380,108 @@ function iniciarMatter(){
     Runner.run(
         runner,
         engine
+    );
+
+    Events.on(
+        engine,
+        "beforeUpdate",
+        ()=>{
+
+            if(
+                !bola3D
+            ){
+                return;
+            }
+
+            Body.setVelocity(
+                bola3D,
+                {
+                    x:
+                        (mouseX -
+                        bola3D.position.x)
+                        * 0.3,
+
+                    y:
+                        (mouseY -
+                        bola3D.position.y)
+                        * 0.3
+                }
+            );
+
+        }
+    );
+
+    Events.on(
+        engine,
+        "afterUpdate",
+        ()=>{
+
+            if(
+                bola3D
+            ){
+
+                const escena =
+                    document.getElementById(
+                        "escena3d"
+                    );
+
+                escena.style.left =
+                    bola3D.position.x +
+                    "px";
+
+                escena.style.top =
+                    bola3D.position.y +
+                    "px";
+
+            }
+
+            const margen = 300;
+
+            Composite.allBodies(
+                physicsWorld
+            ).forEach(body=>{
+
+                if(
+                    body.isStatic ||
+                    body === bola3D
+                ){
+                    return;
+                }
+
+                if(
+
+                    body.position.x <
+                    -margen ||
+
+                    body.position.x >
+                    window.innerWidth +
+                    margen ||
+
+                    body.position.y <
+                    -margen ||
+
+                    body.position.y >
+                    window.innerHeight +
+                    margen
+
+                ){
+
+                    Composite.remove(
+                        physicsWorld,
+                        body
+                    );
+
+                    piezasDestruyendose.delete(
+                        body.id
+                    );
+
+                }
+
+            });
+
+            revisarFinDeFase();
+
+        }
     );
 
     Composite.add(
@@ -405,7 +532,13 @@ function iniciarMatter(){
         MouseConstraint.create(
             engine,
             {
-                mouse
+                mouse,
+                constraint:{
+                    stiffness:0.2,
+                    render:{
+                        visible:false
+                    }
+                }
             }
         );
 
@@ -415,78 +548,317 @@ function iniciarMatter(){
     );
 
     let ultimoSpawn = 0;
-    const intervaloSpawn = 250;
+    const intervaloSpawn = 100;
 
     Events.on(
-    engine,
-    "collisionStart",
-    (event)=>{
+        engine,
+        "collisionStart",
+        (event)=>{
 
-        const ahora = Date.now();
+            const ahora =
+                Date.now();
 
-        if(
-            ahora - ultimoSpawn <
-            intervaloSpawn
-        ){
-            return;
+            event.pairs.forEach(pair=>{
+
+                if(
+                    bola3D &&
+                    (
+                        pair.bodyA === bola3D ||
+                        pair.bodyB === bola3D
+                    )
+                ){
+
+                    const pieza =
+
+                        pair.bodyA === bola3D
+                        ? pair.bodyB
+                        : pair.bodyA;
+
+                    if(
+                        pieza !== bola3D &&
+                        !pieza.isStatic &&
+                        !piezasDestruyendose.has(
+                            pieza.id
+                        )
+                    ){
+
+                        destruirPiezaSuavemente(
+                            pieza
+                        );
+
+                    }
+
+                    return;
+                }
+
+                const a =
+                    pair.bodyA;
+
+                const b =
+                    pair.bodyB;
+
+                if(
+                    a === bola3D ||
+                    b === bola3D
+                ){
+                    return;
+                }
+
+                if(
+                    a.isStatic ||
+                    b.isStatic
+                ){
+                    return;
+                }
+
+                if(
+                    ahora - ultimoSpawn <
+                    intervaloSpawn
+                ){
+                    return;
+                }
+
+                const puntoColision = {
+
+                    x:
+                        pair.collision
+                        .supports[0].x,
+
+                    y:
+                        pair.collision
+                        .supports[0].y
+
+                };
+
+                const cuerposDinamicos =
+
+                    Composite.allBodies(
+                        physicsWorld
+                    ).filter(
+                        body =>
+
+                            !body.isStatic &&
+                            body !== bola3D
+
+                    );
+
+                if(
+                    cuerposDinamicos.length <
+                    100 &&
+                    !bolaCreada
+                ){
+
+                    ultimoSpawn =
+                        ahora;
+
+                    crearPiezaMatter(
+
+                        puntoColision.x +
+                        (Math.random()-0.5)
+                        * 40,
+
+                        puntoColision.y +
+                        (Math.random()-0.5)
+                        * 40
+
+                    );
+
+                }
+                else if(
+                    !bolaCreada
+                ){
+
+                    mostrarBola3D();
+
+                }
+
+            });
+
         }
-
-        event.pairs.forEach(pair=>{
-
-            const a = pair.bodyA;
-            const b = pair.bodyB;
-
-            // Ignorar paredes
-
-            if(
-                a.isStatic ||
-                b.isStatic
-            ){
-                return;
-            }
-
-            const puntoColision = {
-
-                x:
-                    pair.collision.supports[0].x,
-
-                y:
-                    pair.collision.supports[0].y
-
-            };
-
-            const cuerposDinamicos =
-
-                Composite.allBodies(
-                    physicsWorld
-                ).filter(
-                    body => !body.isStatic
-                );
-
-            // nuevo límite mucho más alto
-
-            if(
-                cuerposDinamicos.length < 500
-            ){
-
-                ultimoSpawn = ahora;
-
-                crearPiezaMatter(
-
-                    puntoColision.x +
-                    (Math.random()-0.5)*40,
-
-                    puntoColision.y +
-                    (Math.random()-0.5)*40
-
     );
 
 }
 
-        });
+function mostrarBola3D(){
+
+    bolaCreada = true;
+
+    document
+        .getElementById(
+            "escena3d"
+        )
+        .style.display = "block";
+
+    const radioBola = 120;
+
+bola3D =
+    Bodies.circle(
+
+        window.innerWidth/2,
+        window.innerHeight/2,
+
+        radioBola,
+
+        {
+
+                restitution:0.4,
+
+                friction:0,
+
+                frictionAir:0.005,
+
+                density:0.1,
+
+                render:{
+                    visible:false
+                }
+
+            }
+
+        );
+
+    Composite.add(
+        physicsWorld,
+        bola3D
+    );
+
+    Body.setMass(
+        bola3D,
+        5000
+    );
+
+    Body.setInertia(
+    bola3D,
+    Infinity
+);
+}
+
+function destruirPiezaSuavemente(pieza){
+
+    if(
+        piezasDestruyendose.has(pieza.id)
+    ){
+        return;
+    }
+
+    piezasDestruyendose.add(
+        pieza.id
+    );
+
+    Body.setVelocity(
+        pieza,
+        {
+            x:0,
+            y:0
+        }
+    );
+
+    Body.setAngularVelocity(
+        pieza,
+        0
+    );
+
+    Body.setStatic(
+        pieza,
+        true
+    );
+
+    let pasos = 8;
+
+const animacion =
+    setInterval(()=>{
+
+        pasos--;
+
+        Body.scale(
+            pieza,
+            1.08,
+            1.08
+        );
+
+        pieza.render.opacity =
+            pasos / 8;
+
+        if(
+            pasos <= 0
+        ){
+
+            clearInterval(
+                animacion
+            );
+
+            Composite.remove(
+                physicsWorld,
+                pieza
+            );
+
+            piezasDestruyendose.delete(
+                pieza.id
+            );
+
+            revisarFinDeFase();
+
+        }
+
+    },15);
+
+}
+
+function revisarFinDeFase(){
+
+    if(
+        faseSiguienteIniciada
+    ){
+        return;
+    }
+
+    const piezasRestantes =
+
+        Composite.allBodies(
+            physicsWorld
+        ).filter(body =>
+
+            body !== bola3D &&
+            !body.isStatic &&
+            !piezasDestruyendose.has(
+                body.id
+            )
+
+        );
+
+    if(
+        piezasRestantes.length === 0 &&
+        piezasDestruyendose.size === 0
+    ){
+
+        faseSiguienteIniciada =
+            true;
+
+        if(
+            bola3D
+        ){
+
+            Composite.remove(
+                physicsWorld,
+                bola3D
+            );
+
+            bola3D = null;
+
+        }
+
+        document
+            .getElementById(
+                "escena3d"
+            )
+            .style.display =
+            "none";
+
+        console.log(
+            "Siguiente fase"
+        );
 
     }
-);
 
 }
 
