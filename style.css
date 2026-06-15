@@ -163,9 +163,104 @@ body{
 
     font-family:"ArgentumSans", sans-serif;
     font-weight:400;
-    background:#FDF9EB;
+    background:#fff5d2;
     color:#4B3E00;
     line-height:1.6;
+    cursor:
+    url("imagenes/cursror-normal.png")
+    0 0,
+    auto;
+
+}
+
+/* Cursor normal */
+
+html,
+body,
+*{
+
+    cursor:
+    url("imagenes/cursor-normal.png")
+    0 0,
+    auto;
+
+}
+
+/* Cursor hover */
+
+a:hover,
+button:hover,
+#container:hover,
+#world canvas:hover{
+
+    cursor:
+    url("imagenes/cursor-hover.png")
+    0 0,
+    auto !important;
+
+}
+
+/* Ancho de la barra */
+
+::-webkit-scrollbar{
+
+    width:12px;
+
+}
+
+/* Fondo */
+
+::-webkit-scrollbar-track{
+
+    background:#FDF9EB;
+
+}
+
+/* Barra móvil */
+
+::-webkit-scrollbar-thumb{
+
+    background:#8c2041;
+
+    border-radius:999px;
+
+    border:2px solid #FDF9EB;
+
+}
+
+/* Hover */
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#6f1833;
+
+}
+
+::-webkit-scrollbar{
+
+    width:14px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#efd978;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#c2e3e8;
+
+    border:3px solid #FDF9EB;
+
+    border-radius:0;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#8c2041;
 
 }
 
@@ -183,7 +278,7 @@ h2{
 
 p{
 
-    font-family:"AlteHaas", sans-serif;
+    font-family:"ArgentumSans", sans-serif;
 
     font-weight:400;
 
