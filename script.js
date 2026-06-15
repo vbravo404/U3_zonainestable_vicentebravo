@@ -326,20 +326,24 @@ const hero =
 function controlarLogo(){
 
     const limite =
+        hero.offsetHeight * 0.8;
 
-        hero.offsetHeight * 0.5;
+    const header =
+        document.querySelector(
+            "header"
+        );
 
     if(
         window.scrollY > limite
     ){
 
-        logo.classList.add(
+        header.classList.add(
             "visible"
         );
 
     }else{
 
-        logo.classList.remove(
+        header.classList.remove(
             "visible"
         );
 
