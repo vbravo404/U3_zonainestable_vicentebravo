@@ -10,6 +10,11 @@
 
     <link rel="stylesheet" href="style.css">
 
+    <script
+    type="module"
+    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
+    </script>
+
 </head>
 
 <body>
@@ -112,24 +117,30 @@ class="section">
     </div>
 
     <p>
-        Geometrías Inestables nace desde el Taller de Diseño de Interacción 2026, para el cual se diseñó el juego de mesa llamado <strong>"Zona Inestable"</strong>        
+        Geometrías Inestables nace en el Taller de Diseño de Interacción 2026, para el cual se diseñó el juego de mesa llamado <strong>"Zona Inestable"</strong>.
+    </p>
+    <p>
+        El juego consiste en 2 fases: la primera de preparación, en donde un máximo de 4 jugadores arman hasta 7 plataformas de la forma que estos deseen y colocan encima 
+        piezas de distintos colores, las cuales en la siguiente fase de juego, deberán derribar con cuidado de no botar las de su propio color.
+    </p>
+    <p>
+        La caja del juego contiene 7 plataformas hexagonales, 7 bases circulares, 7 pilares de madera, 2 cañas extendibles, 1 bola pesada negra, 1 bola ligera blanca, 1 ruleta de condiciones y
+        32 piezas normales de distintos colores (8 por cada color), 8 piezas especiales de distintos colores (2 por cada color).
+
     </p>
 
 </div>
 
-    <div class="image-column">
+    <div class="modelo-3d">
 
-        <div class="placeholder">
+    <model-viewer
+        src="modelos/plataforma.glb"
+        auto-rotate>
+    </model-viewer>
 
-            Imagen
+</div>
 
-        </div>
-
-    </div>
-
-
-
-    
+</div>    
 
 </section>
 
@@ -153,22 +164,8 @@ class="section">
     </div>
 
     <p>
-        Las piezas utilizadas en la exploración
-        se construyen mediante polígonos simples
-        que evolucionan mediante transformaciones,
-        rebotes y colisiones.
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
-        texto textotexto texto textotexto texto textotexto
+        Para esta página interactiva se eligió profundizar y jugar con los aspectos geométricos del juego de mesa,
+        pensando en el hecho de tener polígonos tridimensionales como prismas rectangulares, hexagonales y prismas irregulares como las piezas especiales.
         
     </p>
 
