@@ -668,7 +668,9 @@ function iniciarMatter(){
                     !bolaCreada
                 ){
 
-                    mostrarBola3D();
+                    bolaCreada = true;
+
+                    transicionAparicionBola();
 
                 }
 
@@ -676,6 +678,76 @@ function iniciarMatter(){
 
         }
     );
+
+}
+
+function fadeOverlay(
+    color,
+    duracion = 150
+){
+
+    return new Promise(resolve=>{
+
+        const overlay =
+            document.getElementById(
+                "flashOverlay"
+            );
+
+        overlay.style.transition =
+            "none";
+
+        overlay.style.background =
+            color;
+
+        overlay.style.opacity =
+            "1";
+
+        requestAnimationFrame(()=>{
+
+            overlay.style.transition =
+                `opacity ${duracion}ms ease`;
+
+            overlay.style.opacity =
+                "0.5";
+
+            setTimeout(()=>{
+
+                overlay.style.opacity =
+                    "0";
+
+                setTimeout(
+                    resolve,
+                    duracion
+                );
+
+            },duracion);
+
+        });
+
+    });
+
+}
+
+async function transicionAparicionBola(){
+
+    await new Promise(
+        resolve => setTimeout(
+            resolve,
+            4000
+        )
+    );
+
+    await fadeOverlay(
+        "#000000",
+        180
+    );
+
+    await fadeOverlay(
+        "#ffffff",
+        180
+    );
+
+    mostrarBola3D();
 
 }
 
@@ -763,6 +835,11 @@ function destruirPiezaSuavemente(pieza){
         true
     );
 
+    pieza.render.sprite = {
+        xScale: 1,
+        yScale: 1
+    };
+
     let pasos = 8;
 
 const animacion =
@@ -770,14 +847,17 @@ const animacion =
 
         pasos--;
 
-        Body.scale(
-            pieza,
-            1.08,
-            1.08
-        );
+        const progreso =
+            1 - (pasos / 8);
 
         pieza.render.opacity =
             pasos / 8;
+
+        pieza.render.sprite.xScale =
+            1 + (progreso * 0.25);
+
+        pieza.render.sprite.yScale =
+            1 + (progreso * 0.25);
 
         if(
             pasos <= 0
@@ -835,28 +915,44 @@ function revisarFinDeFase(){
             true;
 
         if(
+    bola3D
+){
+
+    const escena =
+        document.getElementById(
+            "escena3d"
+        );
+
+    escena.style.transition =
+        "opacity 300ms ease";
+
+    escena.style.opacity =
+        "0";
+
+    setTimeout(()=>{
+
+        Composite.remove(
+            physicsWorld,
             bola3D
-        ){
+        );
 
-            Composite.remove(
-                physicsWorld,
-                bola3D
-            );
+        bola3D = null;
 
-            bola3D = null;
-
-        }
-
-        document
-            .getElementById(
-                "escena3d"
-            )
-            .style.display =
+        escena.style.display =
             "none";
+
+        escena.style.opacity =
+            "1";
 
         console.log(
             "Siguiente fase"
         );
+
+        // AQUÍ TU SIGUIENTE FASE
+
+    },300);
+
+}
 
     }
 
