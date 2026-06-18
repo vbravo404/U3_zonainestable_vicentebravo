@@ -58,6 +58,7 @@ const formas = [
 
 let formaActual = 0;
 let modoFinal = false;
+let reiniciando = false;
 
 function actualizarSVG(puntos){
 
@@ -412,72 +413,206 @@ function iniciarMatter(){
     );
 
     Events.on(
-        engine,
-        "afterUpdate",
-        ()=>{
+    engine,
+    "afterUpdate",
+    ()=>{
+
+        // ===================================
+        // Sincroniza el modelo 3D
+        // con la bola física de Matter
+        // ===================================
+
+        if(
+            bola3D
+        ){
+
+            const escena =
+                document.getElementById(
+                    "escena3d"
+                );
+
+            escena.style.left =
+                bola3D.position.x +
+                "px";
+
+            escena.style.top =
+                bola3D.position.y +
+                "px";
+
+        }
+
+        // Distancia extra fuera de pantalla
+    const margen = 300;
+
+    // Obtenemos todas las piezas activas.
+    // No contamos:
+    // - Muros estáticos
+    // - La bola negra
+    // - Piezas que ya están desapareciendo
+
+    const piezasActivas =
+
+        Composite.allBodies(
+            physicsWorld
+        ).filter(body =>
+
+            !body.isStatic &&
+            body !== bola3D &&
+            !piezasDestruyendose.has(
+                body.id
+            )
+
+        );
+
+    // Recorremos todos los cuerpos
+    // para decidir qué hacer con ellos.
+
+Composite.allBodies(
+    physicsWorld
+).forEach(body=>{
+
+    // Ignorar muros y bola
+
+    if(
+        body.isStatic ||
+        body === bola3D
+    ){
+        return;
+    }
+
+    // ===================================
+    // PROTECCIÓN FINAL
+    // ===================================
+    //
+    // Si quedan solamente
+    // 1 o 2 piezas activas,
+    // ya no pueden escapar.
+    //
+    // Esto evita que la fase
+    // se estanque porque la
+    // última pieza desapareció
+    // lejos de la pantalla.
+    //
+    // Con 3 o más piezas,
+    // el comportamiento sigue
+    // siendo el original.
+    //
+    // ===================================
+
+    if(
+        piezasActivas.length <= 2
+    ){
+
+        const margenPantalla = 50;
+
+        const x =
+
+            Math.max(
+
+                margenPantalla,
+
+                Math.min(
+
+                    window.innerWidth -
+                    margenPantalla,
+
+                    body.position.x
+
+                )
+
+            );
+
+        const y =
+
+            Math.max(
+
+                margenPantalla,
+
+                Math.min(
+
+                    window.innerHeight -
+                    margenPantalla,
+
+                    body.position.y
+
+                )
+
+            );
+
+        // Si intentó salir,
+        // lo devolvemos hacia
+        // el interior.
+
+        if(
+            x !== body.position.x ||
+            y !== body.position.y
+        ){
+
+            Body.setPosition(
+                body,
+                {x,y}
+            );
+
+            Body.setVelocity(
+                body,
+                {
+
+                    x:
+                        -body.velocity.x
+                        * 0.8,
+
+                    y:
+                        -body.velocity.y
+                        * 0.8
+
+                }
+            );
+
+        }
+
+        return;
+    }
+
+            // ===================================
+            // COMPORTAMIENTO NORMAL
+            // ===================================
+            //
+            // Mientras existan 3 o más piezas,
+            // las que escapen demasiado lejos
+            // son eliminadas.
+            //
+            // ===================================
 
             if(
-                bola3D
+
+                body.position.x <
+                -margen ||
+
+                body.position.x >
+                window.innerWidth +
+                margen ||
+
+                body.position.y <
+                -margen ||
+
+                body.position.y >
+                window.innerHeight +
+                margen
+
             ){
 
-                const escena =
-                    document.getElementById(
-                        "escena3d"
-                    );
+                Composite.remove(
+                    physicsWorld,
+                    body
+                );
 
-                escena.style.left =
-                    bola3D.position.x +
-                    "px";
-
-                escena.style.top =
-                    bola3D.position.y +
-                    "px";
+                piezasDestruyendose.delete(
+                    body.id
+                );
 
             }
 
-            const margen = 300;
-
-            Composite.allBodies(
-                physicsWorld
-            ).forEach(body=>{
-
-                if(
-                    body.isStatic ||
-                    body === bola3D
-                ){
-                    return;
-                }
-
-                if(
-
-                    body.position.x <
-                    -margen ||
-
-                    body.position.x >
-                    window.innerWidth +
-                    margen ||
-
-                    body.position.y <
-                    -margen ||
-
-                    body.position.y >
-                    window.innerHeight +
-                    margen
-
-                ){
-
-                    Composite.remove(
-                        physicsWorld,
-                        body
-                    );
-
-                    piezasDestruyendose.delete(
-                        body.id
-                    );
-
-                }
-
-            });
+        });
 
             revisarFinDeFase();
 
@@ -914,47 +1049,174 @@ function revisarFinDeFase(){
         faseSiguienteIniciada =
             true;
 
-        if(
-    bola3D
-){
+        iniciarReinicio();
+
+    }
+
+}
+
+function iniciarReinicio(){
+
+    if(reiniciando){
+        return;
+    }
+
+    reiniciando = true;
 
     const escena =
         document.getElementById(
             "escena3d"
         );
 
-    escena.style.transition =
-        "opacity 300ms ease";
+    // Fondo negro inmediatamente
 
-    escena.style.opacity =
-        "0";
+    document.body.style.transition =
+        "background-color 1.8s ease";
+
+    document.body.style.backgroundColor =
+        "#000";
+
+    // Bola gigante
+
+    escena.style.transition =
+        "transform 1.8s ease";
+
+    escena.style.transform =
+        "translate(-50%,-50%) scale(12)";
+
+    // Desaparece justo al terminar
 
     setTimeout(()=>{
-
-        Composite.remove(
-            physicsWorld,
-            bola3D
-        );
-
-        bola3D = null;
 
         escena.style.display =
             "none";
 
-        escena.style.opacity =
-            "1";
+        crearCirculoFinal();
 
-        console.log(
-            "Siguiente fase"
-        );
-
-        // AQUÍ TU SIGUIENTE FASE
-
-    },300);
+    },1800);
 
 }
 
+function crearCirculoFinal(){
+
+    const circulo =
+        document.createElement(
+            "div"
+        );
+
+    circulo.id =
+        "circulo-reinicio";
+
+    circulo.style.opacity = "0";
+
+    document.body.appendChild(
+        circulo
+    );
+
+    requestAnimationFrame(()=>{
+
+        circulo.style.transition =
+            "opacity 500ms ease";
+
+        circulo.style.opacity =
+            "1";
+
+    });
+
+    circulo.addEventListener(
+
+    "click",
+
+    ()=>{
+
+        circulo.classList.add(
+            "morph-hexagono"
+        );
+
+        setTimeout(()=>{
+
+            location.reload();
+
+        },1200);
+
+    },
+
+    {once:true}
+
+);
+
+}
+
+function reiniciarExperiencia(
+    circulo
+){
+
+    if(
+        physicsWorld
+    ){
+
+        Composite.clear(
+            physicsWorld,
+            false
+        );
+
     }
+
+    if(
+        engine
+    ){
+
+        Engine.clear(
+            engine
+        );
+
+    }
+
+    world.innerHTML = "";
+
+    bola3D = null;
+
+    bolaCreada = false;
+
+    faseSiguienteIniciada = false;
+
+    reiniciando = false;
+
+    modoFinal = false;
+
+    piezasDestruyendose.clear();
+
+    formaActual = 0;
+
+    actualizarSVG(
+        formas[0]
+    );
+
+    cambiarColorFondo(
+        0
+    );
+
+    document.body.style.background =
+        coloresFondo[0];
+
+        document.body.style.transition =
+    "background-color 1.2s ease";
+
+    container.style.display =
+        "block";
+
+    const escena =
+        document.getElementById(
+            "escena3d"
+        );
+
+    escena.style.display =
+        "none";
+
+    escena.style.transform =
+        "translate(-50%,-50%)";
+
+    circulo.remove();
 
 }
 
