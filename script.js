@@ -350,3 +350,278 @@ function controlarLogo(){
     }
 
 }
+
+// =====================
+// MINI MATTER GEOMETRÍAS
+// =====================
+
+const miniContainer =
+    document.getElementById(
+        "mini-matter-container"
+    );
+
+if(
+    miniContainer &&
+    typeof Matter !== "undefined"
+){
+
+    const Engine =
+        Matter.Engine;
+
+    const Render =
+        Matter.Render;
+
+    const Runner =
+        Matter.Runner;
+
+    const Bodies =
+        Matter.Bodies;
+
+    const Composite =
+        Matter.Composite;
+
+    const Body =
+        Matter.Body;
+
+    const miniEngine =
+        Engine.create();
+
+    miniEngine.gravity.y = 0;
+
+    const ancho =
+        500;
+
+    const alto =
+        500;
+
+    const miniRender =
+        Render.create({
+
+            element:
+                miniContainer,
+
+            engine:
+                miniEngine,
+
+            options:{
+
+                width:
+                    ancho,
+
+                height:
+                    alto,
+
+                wireframes:false,
+
+                background:
+                    "transparent"
+
+            }
+
+        });
+
+    Render.run(
+        miniRender
+    );
+
+    const runner =
+        Runner.create();
+
+    Runner.run(
+        runner,
+        miniEngine
+    );
+
+    const mouse =
+    Matter.Mouse.create(
+        miniRender.canvas
+    );
+
+    const mouseConstraint =
+        Matter.MouseConstraint.create(
+            miniEngine,
+            {
+                mouse,
+                constraint:{
+                    stiffness:0.15,
+                    render:{
+                        visible:false
+                    }
+                }
+            }
+        );
+
+    Composite.add(
+        miniEngine.world,
+        mouseConstraint
+    );
+
+miniRender.mouse = mouse;
+
+    Composite.add(
+        miniEngine.world,
+        [
+
+            Bodies.rectangle(
+                ancho/2,
+                -20,
+                ancho,
+                40,
+                {isStatic:true}
+            ),
+
+            Bodies.rectangle(
+                ancho/2,
+                alto+20,
+                ancho,
+                40,
+                {isStatic:true}
+            ),
+
+            Bodies.rectangle(
+                -20,
+                alto/2,
+                40,
+                alto,
+                {isStatic:true}
+            ),
+
+            Bodies.rectangle(
+                ancho+20,
+                alto/2,
+                40,
+                alto,
+                {isStatic:true}
+            )
+
+        ]
+    );
+
+    function crearMiniPieza(){
+
+        const forma =
+            Math.floor(
+                Math.random()*4
+            );
+
+        let vertices;
+
+        switch(forma){
+            // Hexágono
+            case 0:
+
+                vertices = [
+                    {x:-150,y:0},
+                    {x:-75,y:-130},
+                    {x:75,y:-130},
+                    {x:150,y:0},
+                    {x:75,y:130},
+                    {x:-75,y:130}
+                ]
+
+            break;
+
+            // Especial
+            case 1:
+
+                vertices = [
+                    {x:-60,y:-55},
+                    {x:-25,y:-120},
+                    {x:25,y:-120},
+                    {x:60,y:-55},
+                    {x:60,y:120},
+                    {x:-60,y:120}
+                ]
+
+            break;
+
+            // Pilar
+            case 2:
+
+                vertices = [
+                    {x:-45,y:-180},
+                    {x:45,y:-180},
+                    {x:45,y:180},
+                    {x:-45,y:180}
+                ]
+
+            break;
+            
+            // Pieza normal - rectángulo
+            default:
+
+                vertices = [
+
+                {x:-60,y:-120},
+                {x:60,y:-120},
+                {x:60,y:120},
+                {x:-60,y:120}
+                ]
+
+        }
+
+        let pieza =
+            Bodies.fromVertices(
+
+                Math.random() * ancho,
+                Math.random() * alto,
+
+                [vertices],
+
+                {
+
+                    restitution:1,
+
+                    friction:0,
+
+                    frictionAir:0,
+
+                    render:{
+
+                        fillStyle:
+                            "#8c2041"
+
+                    }
+
+                },
+
+                true
+
+            );
+
+        if(
+            Array.isArray(
+                pieza
+            )
+        ){
+            pieza = pieza[0];
+        }
+
+        Body.setVelocity(
+            pieza,
+            {
+
+                x:
+                    (Math.random()-0.5)*6,
+
+                y:
+                    (Math.random()-0.5)*6
+
+            }
+        );
+
+        Body.setAngularVelocity(
+            pieza,
+            (Math.random()-0.5)*0.04
+        );
+
+        Composite.add(
+            miniEngine.world,
+            pieza
+        );
+
+    }
+
+    crearMiniPieza();
+
+}

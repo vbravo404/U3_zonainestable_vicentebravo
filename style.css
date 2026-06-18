@@ -774,3 +774,36 @@ nav a.active::after{
         translateY(-3px);
 
 }
+
+.mini-matter-container{
+
+    width:100%;
+    max-width:500px;
+
+    aspect-ratio:1;
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:transparent;
+
+    border:none;
+
+    outline:none;
+
+    box-shadow:none;
+
+}
+
+.mini-matter-container canvas{
+
+    display:block;
+
+    background:transparent !important;
+
+    border:none !important;
+
+    outline:none !important;
+
+}
