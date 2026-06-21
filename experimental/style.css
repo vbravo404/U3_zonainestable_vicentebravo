@@ -165,3 +165,68 @@ svg{
     text-align: center;
     white-space: nowrap;
 }
+
+/* Contenedor padre que centra todo en la pantalla */
+/* El contenedor padre solo sirve para organizar, no para la opacidad */
+#overlay-reinicio {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+/* El círculo tiene su propia transición */
+#circulo-reinicio {
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    pointer-events: auto;
+    opacity: 0; /* Empieza invisible */
+    transition: opacity 600ms ease;
+}
+
+/* El contenedor del texto también tiene su propia transición */
+.ui-contenedor {
+    pointer-events: auto;
+    text-align: center;
+    margin-bottom: 40px;
+    opacity: 0; /* Empieza invisible */
+    transition: opacity 600ms ease;
+}
+
+.texto-reinicio {
+    font-family: 'ArgentumSans', sans-serif;
+    font-size: 1.2rem;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+.btn-volver {
+    font-family: 'ArgentumSans', sans-serif;
+    background-color: #ffffff;
+    color: #8c2041;
+    padding: 10px 25px;
+    text-decoration: none;
+    
+    /* CAMBIO AQUÍ: de 25px a 0 para que sea un rectángulo */
+    border-radius: 0px; 
+    
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    pointer-events: auto;
+    
+    /* Opcional: añade un borde si quieres que destaque más como rectángulo */
+    border: 2px solid #ffffff; 
+}
+
+.btn-volver:hover {
+    background-color: #8c2041;
+    color: #ffffff;
+    border-color: #ffffff;
+}

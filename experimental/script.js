@@ -447,42 +447,59 @@ function iniciarReinicio(){
     },1800);
 }
 
-function crearCirculoFinal(){
+function crearCirculoFinal() {
+    // 1. Contenedor padre
+    const overlay = document.createElement("div");
+    overlay.id = "overlay-reinicio";
+
+    // 2. Contenedor del texto y botón
+    const uiContenedor = document.createElement("div");
+    uiContenedor.className = "ui-contenedor";
+
+    const texto = document.createElement("p");
+    texto.className = "texto-reinicio";
+    texto.innerText = "PRESIONA EL CÍRCULO PARA REPETIR LA EXPERIENCIA \n";
+
+    const boton = document.createElement("a");
+    boton.className = "btn-volver";
+    boton.innerText = "O VUELVE AL INICIO";
+    boton.href = "../index.html"; 
+
+    uiContenedor.appendChild(texto);
+    uiContenedor.appendChild(boton);
+
+    // 3. Círculo
     const circulo = document.createElement("div");
     circulo.id = "circulo-reinicio";
 
-    circulo.style.opacity = "1";
-    circulo.style.pointerEvents = "auto";
-    circulo.style.zIndex = "99999";
-    circulo.style.position = "fixed";
-    circulo.style.left = "50%";
-    circulo.style.top = "50%";
-    circulo.style.width = "350px";
-    circulo.style.height = "350px";
-    circulo.style.borderRadius = "50%";
-    circulo.style.background = "#ffffff";
-    circulo.style.transform = "translate(-50%,-50%)";
-    circulo.style.cursor = "pointer";
-    circulo.style.opacity = "0";
+    // 4. Armar estructura
+    overlay.appendChild(uiContenedor);
+    overlay.appendChild(circulo);
+    document.body.appendChild(overlay);
 
-    document.body.appendChild(circulo);
-
-    requestAnimationFrame(()=>{
-        circulo.style.transition = "opacity 600ms ease";
+    // 5. Animación escalonada
+    requestAnimationFrame(() => {
+        // Aparece el círculo inmediatamente
         circulo.style.opacity = "1";
+
+        // Esperamos 2000ms (2 segundos) para mostrar el texto
+        setTimeout(() => {
+            uiContenedor.style.opacity = "1";
+        }, 700);
     });
 
-    circulo.addEventListener("click", ()=>{
+    // Lógica del Círculo
+    circulo.addEventListener("click", () => {
+        // Al clickear, desaparecemos ambos suavemente
+        uiContenedor.style.opacity = "0";
         circulo.style.opacity = "0";
         
-        // --- SOLUCIÓN 1: Llamamos de inmediato a mostrarHexagonoInicial para que 
-        // ocurra el crossfade en paralelo a la desaparición del círculo ---
         mostrarHexagonoInicial();
         
-        setTimeout(()=>{
-            circulo.remove();
-        },600);
-    }, {once:true});
+        setTimeout(() => {
+            overlay.remove();
+        }, 600);
+    }, {once: true});
 }
 
 function mostrarHexagonoInicial(){
@@ -576,7 +593,7 @@ function activarModoFinal(){
 function mostrarInstruccion() {
     const div = document.createElement("div");
     div.id = "instrucciones";
-    div.innerText = "¡HAZ COLISIONAR LAS PIEZAS!";
+    div.innerText = "¡HAZ CHOCAR LAS PIEZAS!";
     document.body.appendChild(div);
 
     // Fade-in
