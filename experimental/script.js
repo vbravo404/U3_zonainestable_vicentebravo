@@ -1,47 +1,103 @@
-// --- NUEVO: Definición de secuencias ---
-const secuencias = [
-    // Secuencia 1 (Original)
-    { formas: [0, 1, 2, 3], fondos: [0, 1, 2, 3] },
-    // Secuencia 2 (Tu nueva petición)
-    { formas: [3, 1, 0, 2], fondos: [1, 0, 3, 2] },
-    // Secuencia 3 (Ejemplo: otro orden)
-    { formas: [2, 0, 3, 1], fondos: [2, 3, 0, 1] },
-    // Secuencia 4 (Ejemplo: otro orden)
-    { formas: [1, 3, 2, 0], fondos: [3, 2, 1, 0] }
+const coloresFondo = [
+    "#f4bdbf",
+    "#c2e3e8",
+    "#efd978",
+    "#8c2041"
 ];
 
-let indiceSecuenciaActual = 0; // Controla qué secuencia usar
-const coloresFondo = ["#f4bdbf", "#c2e3e8", "#efd978", "#8c2041"];
-const coloresPiezas = ["#8c2041", "#c2e3e8", "#efd978", "#f4bdbf"];
+const coloresPiezas = [
+    "#8c2041",
+    "#c2e3e8",
+    "#efd978",
+    "#f4bdbf"
+];
 
-// Función para obtener la forma actual basada en la secuencia
-function getForma(paso) {
-    return formas[secuencias[indiceSecuenciaActual].formas[paso]];
+function cambiarColorFondo(indice){
+    document.body.style.backgroundColor = coloresFondo[indice];
 }
 
-// Función para obtener el color de fondo basado en la secuencia
-function getColorFondo(paso) {
-    return coloresFondo[secuencias[indiceSecuenciaActual].fondos[paso]];
-}
-
-// --- Resto de tus variables existentes ---
 const shape = document.getElementById("shape");
 const container = document.getElementById("container");
 const world = document.getElementById("world");
-// --- SUSTITUYE TU LÍNEA VACÍA POR ESTA ESTRUCTURA ---
+
 const formas = [
-    [[-120, 0], [-60, -105], [60, -105], [120, 0], [60, 105], [-60, 105]], // Hexágono (Indice 0)
-    [[-45, -90], [45, -90], [45, 90], [-45, 90]],                         // Rectángulo (Indice 1)
-    [[-45, -40], [-18, -90], [18, -90], [45, -40], [45, 90], [-45, 90]], // Especial (Indice 2)
-    [[-35, -140], [35, -140], [35, 140], [-35, 140]]                      // Pilar (Indice 3)
+    /* Forma 1 - Rectángulo horizontal */
+    [
+        [10,40],[90,40],[90,40],[90,40],
+        [90,60],[10,60],[10,60],[10,60]
+    ],
+    /* Forma 2 - Rectángulo vertical */
+    [
+        [30,25],[60,25],[60,25],[60,25],
+        [60,75],[30,75],[30,75],[30,75]
+    ],
+    /* Forma 3 - Punta */
+    [
+        [30,25],[60,25],[60,75],[50,90],
+        [50,90],[40,90],[30,75],[30,25]
+    ],
+    /* Forma 4 - Hexágono */
+    [
+        [30,15],[70,15],[90,50],[70,85],
+        [30,85],[10,50],[10,50],[30,15]
+    ]
 ];
 
 let formaActual = 0;
-let pasoActual = 0; 
-// AÑADE ESTAS DOS LÍNEAS AQUÍ:
+let modoFinal = false;
+let reiniciando = false;
+
+// Para saber si venimos del círculo final y debemos reiniciar el loop
 let postReinicio = false; 
-let esLoop = false;
-// ... (mantén el resto de variables iguales)
+
+// --- SOLUCIÓN 2: Nueva variable para controlar que estamos en la segunda pasada (loop) ---
+let esLoop = false; 
+
+function actualizarSVG(puntos){
+    const texto = puntos.map(p => `${p[0]},${p[1]}`).join(" ");
+    shape.setAttribute("points", texto);
+}
+
+actualizarSVG(formas[0]);
+
+function interpolar(a,b,t){
+    return a + (b-a)*t;
+}
+
+function morph(indiceDestino){
+    const inicio = formas[formaActual];
+    const destino = formas[indiceDestino];
+    const duracion = 900;
+    let inicioTiempo = null;
+
+    function frame(tiempo){
+        if(!inicioTiempo){
+            inicioTiempo = tiempo;
+        }
+
+        let progreso = (tiempo - inicioTiempo) / duracion;
+        progreso = Math.min(progreso, 1);
+
+        const eased = 0.5 - Math.cos(progreso*Math.PI)/2;
+        const puntos = [];
+
+        for(let i=0; i<inicio.length; i++){
+            puntos.push([
+                interpolar(inicio[i][0], destino[i][0], eased),
+                interpolar(inicio[i][1], destino[i][1], eased)
+            ]);
+        }
+
+        actualizarSVG(puntos);
+
+        if(progreso < 1){
+            requestAnimationFrame(frame);
+        }
+    }
+
+    requestAnimationFrame(frame);
+    formaActual = indiceDestino;
+}
 
 function crearPiezaMatter(x, y){
     const formaIndice = Math.floor(Math.random() * 4);
@@ -95,47 +151,6 @@ function crearPiezaMatter(x, y){
     });
 
     return pieza;
-}
-
-// Función necesaria para la animación
-function interpolar(a, b, t) {
-    return a + (b - a) * t;
-}
-
-function actualizarSVG(puntos) {
-    // Si tus puntos son coordenadas [x, y], esta función los convierte en un string "d"
-    const pathData = puntos.map((p, i) => (i === 0 ? "M " : "L ") + p[0] + " " + p[1]).join(" ") + " Z";
-    shape.setAttribute("d", pathData);
-}
-
-// Función principal de animación
-function morph(siguientePaso) {
-    // Usamos las nuevas funciones de secuencia
-    const inicio = getForma(pasoActual);
-    const destino = getForma(siguientePaso);
-    
-    const duracion = 900;
-    let inicioTiempo = null;
-
-    function frame(tiempo){
-        if(!inicioTiempo) inicioTiempo = tiempo;
-        let progreso = Math.min((tiempo - inicioTiempo) / duracion, 1);
-        const eased = 0.5 - Math.cos(progreso*Math.PI)/2;
-        const puntos = [];
-
-        for(let i=0; i<inicio.length; i++){
-            puntos.push([
-                interpolar(inicio[i][0], destino[i][0], eased),
-                interpolar(inicio[i][1], destino[i][1], eased)
-            ]);
-        }
-        actualizarSVG(puntos);
-        if(progreso < 1) requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-    
-    // Actualizamos el paso actual después de iniciar el morph
-    pasoActual = siguientePaso; 
 }
 
 // =====================
@@ -511,10 +526,6 @@ function mostrarHexagonoInicial(){
     requestAnimationFrame(()=>{
         container.style.opacity = "1";
     });
-
-    pasoActual = 0; // Reseteamos al inicio del array de la secuencia
-    actualizarSVG(getForma(0));
-    cambiarColorFondo(getColorFondo(0));
 }
 
 function reiniciarExperiencia(circulo){
@@ -528,30 +539,24 @@ function reiniciarExperiencia(circulo){
     reiniciando = false;
     modoFinal = false;
     piezasDestruyendose.clear();
+    formaActual = 0;
     
-    postReinicio = true;
-    esLoop = true; 
+    esLoop = false; // Reset de la bandera del loop
 
+    actualizarSVG(formas[0]);
+    cambiarColorFondo(0);
+    document.body.style.background = coloresFondo[0];
+    document.body.style.transition = "background-color 1.2s ease";
+    container.style.display = "block";
+    
     const escena = document.getElementById("escena3d");
     if(escena) {
-        escena.style.transition = "none";
+        escena.style.display = "none";
+        escena.style.transition = "none"; 
         escena.style.transform = "translate(-50%,-50%) scale(1)";
     }
-
-    // --- REEMPLAZO AQUÍ: Usamos las funciones de secuencia ---
-    pasoActual = 0; 
-    actualizarSVG(getForma(0));
-    shape.style.fill = "#ffffff";
-    cambiarColorFondo(getColorFondo(0)); 
-
-    container.style.display = "block";
-    container.style.pointerEvents = "auto";
-    container.style.opacity = "0";
-    container.style.transition = "opacity 1200ms ease";
-
-    requestAnimationFrame(()=>{
-        container.style.opacity = "1";
-    });
+    
+    if(circulo) circulo.remove();
 }
 
 function activarModoFinal(){
@@ -565,37 +570,31 @@ function activarModoFinal(){
     crearPiezaMatter(window.innerWidth * 0.6, window.innerHeight * 0.5);
 }
 
-function cambiarColorFondo(color) {
-    document.body.style.transition = "background-color 0.5s ease";
-    document.body.style.backgroundColor = color;
-}
-
 container.addEventListener("click", ()=>{
     if(modoFinal){ return; }
 
+    // Si venimos del círculo final, el primer click reiniciará al Polígono #1
     if(postReinicio){
         postReinicio = false;
-        pasoActual = 0;
-        indiceSecuenciaActual = (indiceSecuenciaActual + 1) % secuencias.length;
-        
-        morph(1); 
-        cambiarColorFondo(getColorFondo(1));
+        morph(0);
+        cambiarColorFondo(0);
         return;
     }
 
-    let siguiente = pasoActual + 1;
+    // --- SOLUCIÓN 2: Si estamos en el loop, evitamos que llegue a la forma 3 de nuevo ---
+    if (esLoop && formaActual === 2) {
+        activarModoFinal();
+        return;
+    }
 
-    if(siguiente >= 4){ 
+    // Comportamiento normal (0 -> 1 -> 2 -> 3 -> Matter)
+    let siguiente = formaActual + 1;
+
+    if(siguiente >= formas.length){
         activarModoFinal();
         return;
     }
 
     morph(siguiente);
-    cambiarColorFondo(getColorFondo(siguiente));
-});
-
-// --- ESTO VA FUERA DE TODO, AL FINAL DEL ARCHIVO ---
-window.addEventListener("DOMContentLoaded", () => {
-    // Esto asegura que la página inicie sola al abrirse
-    mostrarHexagonoInicial();
+    cambiarColorFondo(Math.min(siguiente, coloresFondo.length - 1));
 });
