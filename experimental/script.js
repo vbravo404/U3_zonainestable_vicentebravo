@@ -1,299 +1,151 @@
 const coloresFondo = [
-
     "#f4bdbf",
     "#c2e3e8",
     "#efd978",
     "#8c2041"
-
 ];
 
 const coloresPiezas = [
-
     "#8c2041",
     "#c2e3e8",
     "#efd978",
     "#f4bdbf"
-
 ];
 
 function cambiarColorFondo(indice){
-
-    document.body.style.backgroundColor =
-        coloresFondo[indice];
-
+    document.body.style.backgroundColor = coloresFondo[indice];
 }
 
-const shape =
-    document.getElementById("shape");
-
-const container =
-    document.getElementById("container");
-
-const world =
-    document.getElementById("world");
+const shape = document.getElementById("shape");
+const container = document.getElementById("container");
+const world = document.getElementById("world");
 
 const formas = [
-
-[
- [10,40],[90,40],[90,40],[90,40],
- [90,60],[10,60],[10,60],[10,60]
-],
-
-[
- [30,25],[60,25],[60,25],[60,25],
- [60,75],[30,75],[30,75],[30,75]
-],
-
-[
- [30,25],[60,25],[60,75],[50,90],
- [50,90],[40,90],[30,75],[30,25]
-],
-
-[
- [30,15],[70,15],[90,50],[70,85],
- [30,85],[10,50],[10,50],[30,15]
-]
-
+    /* Forma 1 - Rectángulo horizontal */
+    [
+        [10,40],[90,40],[90,40],[90,40],
+        [90,60],[10,60],[10,60],[10,60]
+    ],
+    /* Forma 2 - Rectángulo vertical */
+    [
+        [30,25],[60,25],[60,25],[60,25],
+        [60,75],[30,75],[30,75],[30,75]
+    ],
+    /* Forma 3 - Punta */
+    [
+        [30,25],[60,25],[60,75],[50,90],
+        [50,90],[40,90],[30,75],[30,25]
+    ],
+    /* Forma 4 - Hexágono */
+    [
+        [30,15],[70,15],[90,50],[70,85],
+        [30,85],[10,50],[10,50],[30,15]
+    ]
 ];
 
 let formaActual = 0;
 let modoFinal = false;
 let reiniciando = false;
 
+// NUEVA VARIABLE: Para saber si venimos del círculo final y debemos reiniciar el loop
+let postReinicio = false; 
+
 function actualizarSVG(puntos){
-
-    const texto =
-        puntos
-        .map(
-            p => `${p[0]},${p[1]}`
-        )
-        .join(" ");
-
-    shape.setAttribute(
-        "points",
-        texto
-    );
-
+    const texto = puntos.map(p => `${p[0]},${p[1]}`).join(" ");
+    shape.setAttribute("points", texto);
 }
 
-actualizarSVG(
-    formas[0]
-);
+actualizarSVG(formas[0]);
 
 function interpolar(a,b,t){
-
     return a + (b-a)*t;
-
 }
 
 function morph(indiceDestino){
-
-    const inicio =
-        formas[formaActual];
-
-    const destino =
-        formas[indiceDestino];
-
+    const inicio = formas[formaActual];
+    const destino = formas[indiceDestino];
     const duracion = 900;
-
     let inicioTiempo = null;
 
     function frame(tiempo){
-
         if(!inicioTiempo){
-
             inicioTiempo = tiempo;
-
         }
 
-        let progreso =
-            (tiempo - inicioTiempo)
-            / duracion;
+        let progreso = (tiempo - inicioTiempo) / duracion;
+        progreso = Math.min(progreso, 1);
 
-        progreso =
-            Math.min(
-                progreso,
-                1
-            );
-
-        const eased =
-            0.5 -
-            Math.cos(
-                progreso*Math.PI
-            )/2;
-
+        const eased = 0.5 - Math.cos(progreso*Math.PI)/2;
         const puntos = [];
 
-        for(
-            let i=0;
-            i<inicio.length;
-            i++
-        ){
-
+        for(let i=0; i<inicio.length; i++){
             puntos.push([
-
-                interpolar(
-                    inicio[i][0],
-                    destino[i][0],
-                    eased
-                ),
-
-                interpolar(
-                    inicio[i][1],
-                    destino[i][1],
-                    eased
-                )
-
+                interpolar(inicio[i][0], destino[i][0], eased),
+                interpolar(inicio[i][1], destino[i][1], eased)
             ]);
-
         }
 
-        actualizarSVG(
-            puntos
-        );
+        actualizarSVG(puntos);
 
-        if(
-            progreso < 1
-        ){
-
-            requestAnimationFrame(
-                frame
-            );
-
+        if(progreso < 1){
+            requestAnimationFrame(frame);
         }
-
     }
 
-    requestAnimationFrame(
-        frame
-    );
-
-    formaActual =
-        indiceDestino;
-
+    requestAnimationFrame(frame);
+    formaActual = indiceDestino;
 }
 
-function crearPiezaMatter(
-    x,
-    y
-){
-
-    const formaIndice =
-        Math.floor(
-            Math.random() * 4
-        );
-
-    const color =
-        coloresPiezas[
-            Math.floor(
-                Math.random() *
-                coloresPiezas.length
-            )
-        ];
-
+function crearPiezaMatter(x, y){
+    const formaIndice = Math.floor(Math.random() * 4);
+    const color = coloresPiezas[Math.floor(Math.random() * coloresPiezas.length)];
     let vertices;
 
     switch(formaIndice){
-
         case 0: //pieza 1 - HEXÁGONO
-
             vertices = [ 
-                {x:-120,y:0},
-                {x:-60,y:-105},
-                {x:60,y:-105},
-                {x:120,y:0},
-                {x:60,y:105},
-                {x:-60,y:105}
+                {x:-120,y:0}, {x:-60,y:-105}, {x:60,y:-105}, 
+                {x:120,y:0}, {x:60,y:105}, {x:-60,y:105}
             ];
-
-        break;
-
+            break;
         case 1: //pieza 2 - NORMAL (RECTÁNGULO)
-
             vertices = [ 
-                {x:-45,y:-90},
-                {x:45,y:-90},
-                {x:45,y:90},
-                {x:-45,y:90}
+                {x:-45,y:-90}, {x:45,y:-90}, {x:45,y:90}, {x:-45,y:90}
             ];
-
-        break;
-
+            break;
         case 2: //pieza 3 - ESPECIAL (RECTÁNGULO CON PUNTA)
-
             vertices = [
-                {x:-45,y:-40},
-                {x:-18,y:-90},
-                {x:18,y:-90},
-                {x:45,y:-40},
-                {x:45,y:90},
-                {x:-45,y:90}
+                {x:-45,y:-40}, {x:-18,y:-90}, {x:18,y:-90}, 
+                {x:45,y:-40}, {x:45,y:90}, {x:-45,y:90}
             ];
-
-        break;
-
+            break;
         default: //pieza 4 - PILAR
-
             vertices = [ 
-                {x:-35,y:-140},
-                {x:35,y:-140},
-                {x:35,y:140},
-                {x:-35,y:140}
+                {x:-35,y:-140}, {x:35,y:-140}, {x:35,y:140}, {x:-35,y:140}
             ];
-
     }
 
-    let pieza =
-        Bodies.fromVertices(
+    let pieza = Bodies.fromVertices(
+        x, y, [vertices],
+        {
+            restitution:0.95,
+            friction:0,
+            frictionAir:0.002,
+            render:{ fillStyle:color }
+        },
+        true
+    );
 
-            x,
-            y,
-
-            [vertices],
-
-            {
-
-                restitution:0.95,
-
-                friction:0,
-
-                frictionAir:0.002,
-
-                render:{
-                    fillStyle:color
-                }
-
-            },
-
-            true
-
-        );
-
-    if(
-        Array.isArray(pieza)
-    ){
+    if(Array.isArray(pieza)){
         pieza = pieza[0];
     }
 
-    Composite.add(
-        physicsWorld,
-        pieza
-    );
+    Composite.add(physicsWorld, pieza);
 
-    Body.setVelocity(
-        pieza,
-        {
-
-            x:
-                (Math.random()-0.5)
-                * 12,
-
-            y:
-                (Math.random()-0.5)
-                * 12
-
-        }
-    );
+    Body.setVelocity(pieza, {
+        x: (Math.random()-0.5) * 12,
+        y: (Math.random()-0.5) * 12
+    });
 
     return pieza;
 }
@@ -301,7 +153,6 @@ function crearPiezaMatter(
 // =====================
 // MATTER
 // =====================
-
 const Engine = Matter.Engine;
 const Render = Matter.Render;
 const Runner = Matter.Runner;
@@ -314,966 +165,398 @@ const Events = Matter.Events;
 
 let engine = null;
 let physicsWorld = null;
-
+let matterRunner = null; 
+let matterRender = null; 
 let bolaCreada = false;
 let bola3D = null;
 
 const piezasDestruyendose = new Set();
 let faseSiguienteIniciada = false; 
 
-let mouseX =
-    window.innerWidth / 2;
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
 
-let mouseY =
-    window.innerHeight / 2;
-
-window.addEventListener(
-    "mousemove",
-    (e)=>{
-
-        mouseX =
-            e.clientX;
-
-        mouseY =
-            e.clientY;
-
-    }
-);
+window.addEventListener("mousemove", (e)=>{
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
 
 function iniciarMatter(){
-
-    engine =
-        Engine.create();
-
+    engine = Engine.create();
     engine.gravity.y = 0;
+    physicsWorld = engine.world;
 
-    physicsWorld =
-        engine.world;
-
-    const render =
-        Render.create({
-
-            element: world,
-
-            engine,
-
-            options:{
-
-                width:
-                    window.innerWidth,
-
-                height:
-                    window.innerHeight,
-
-                wireframes:false,
-
-                background:"transparent"
-
-            }
-
-        });
-
-    Render.run(render);
-
-    const runner =
-        Runner.create();
-
-    Runner.run(
-        runner,
-        engine
-    );
-
-    Events.on(
+    matterRender = Render.create({
+        element: world,
         engine,
-        "beforeUpdate",
-        ()=>{
+        options:{
+            width: window.innerWidth,
+            height: window.innerHeight,
+            wireframes:false,
+            background:"transparent"
+        }
+    });
 
-            if(
-                !bola3D
-            ){
+    Render.run(matterRender);
+
+    matterRunner = Runner.create();
+    Runner.run(matterRunner, engine);
+
+    Events.on(engine, "beforeUpdate", ()=>{
+        if(!bola3D){ return; }
+
+        Body.setVelocity(bola3D, {
+            x: (mouseX - bola3D.position.x) * 0.3,
+            y: (mouseY - bola3D.position.y) * 0.3
+        });
+    });
+
+    Events.on(engine, "afterUpdate", ()=>{
+        // Sincroniza el modelo 3D con la bola física
+        if(bola3D){
+            const escena = document.getElementById("escena3d");
+            escena.style.left = bola3D.position.x + "px";
+            escena.style.top = bola3D.position.y + "px";
+        }
+
+        const margen = 300;
+
+        const piezasActivas = Composite.allBodies(physicsWorld).filter(body =>
+            !body.isStatic &&
+            body !== bola3D &&
+            !piezasDestruyendose.has(body.id)
+        );
+
+        Composite.allBodies(physicsWorld).forEach(body=>{
+            if(body.isStatic || body === bola3D){ return; }
+
+            // PROTECCIÓN FINAL (evita que se escapen las últimas 2 piezas)
+            if(piezasActivas.length <= 2){
+                const margenPantalla = 50;
+                const x = Math.max(margenPantalla, Math.min(window.innerWidth - margenPantalla, body.position.x));
+                const y = Math.max(margenPantalla, Math.min(window.innerHeight - margenPantalla, body.position.y));
+
+                if(x !== body.position.x || y !== body.position.y){
+                    Body.setPosition(body, {x,y});
+                    Body.setVelocity(body, {
+                        x: -body.velocity.x * 0.8,
+                        y: -body.velocity.y * 0.8
+                    });
+                }
                 return;
             }
 
-            Body.setVelocity(
-                bola3D,
-                {
-                    x:
-                        (mouseX -
-                        bola3D.position.x)
-                        * 0.3,
-
-                    y:
-                        (mouseY -
-                        bola3D.position.y)
-                        * 0.3
-                }
-            );
-
-        }
-    );
-
-    Events.on(
-    engine,
-    "afterUpdate",
-    ()=>{
-
-        // ===================================
-        // Sincroniza el modelo 3D
-        // con la bola física de Matter
-        // ===================================
-
-        if(
-            bola3D
-        ){
-
-            const escena =
-                document.getElementById(
-                    "escena3d"
-                );
-
-            escena.style.left =
-                bola3D.position.x +
-                "px";
-
-            escena.style.top =
-                bola3D.position.y +
-                "px";
-
-        }
-
-        // Distancia extra fuera de pantalla
-    const margen = 300;
-
-    // Obtenemos todas las piezas activas.
-    // No contamos:
-    // - Muros estáticos
-    // - La bola negra
-    // - Piezas que ya están desapareciendo
-
-    const piezasActivas =
-
-        Composite.allBodies(
-            physicsWorld
-        ).filter(body =>
-
-            !body.isStatic &&
-            body !== bola3D &&
-            !piezasDestruyendose.has(
-                body.id
-            )
-
-        );
-
-    // Recorremos todos los cuerpos
-    // para decidir qué hacer con ellos.
-
-Composite.allBodies(
-    physicsWorld
-).forEach(body=>{
-
-    // Ignorar muros y bola
-
-    if(
-        body.isStatic ||
-        body === bola3D
-    ){
-        return;
-    }
-
-    // ===================================
-    // PROTECCIÓN FINAL
-    // ===================================
-    //
-    // Si quedan solamente
-    // 1 o 2 piezas activas,
-    // ya no pueden escapar.
-    //
-    // Esto evita que la fase
-    // se estanque porque la
-    // última pieza desapareció
-    // lejos de la pantalla.
-    //
-    // Con 3 o más piezas,
-    // el comportamiento sigue
-    // siendo el original.
-    //
-    // ===================================
-
-    if(
-        piezasActivas.length <= 2
-    ){
-
-        const margenPantalla = 50;
-
-        const x =
-
-            Math.max(
-
-                margenPantalla,
-
-                Math.min(
-
-                    window.innerWidth -
-                    margenPantalla,
-
-                    body.position.x
-
-                )
-
-            );
-
-        const y =
-
-            Math.max(
-
-                margenPantalla,
-
-                Math.min(
-
-                    window.innerHeight -
-                    margenPantalla,
-
-                    body.position.y
-
-                )
-
-            );
-
-        // Si intentó salir,
-        // lo devolvemos hacia
-        // el interior.
-
-        if(
-            x !== body.position.x ||
-            y !== body.position.y
-        ){
-
-            Body.setPosition(
-                body,
-                {x,y}
-            );
-
-            Body.setVelocity(
-                body,
-                {
-
-                    x:
-                        -body.velocity.x
-                        * 0.8,
-
-                    y:
-                        -body.velocity.y
-                        * 0.8
-
-                }
-            );
-
-        }
-
-        return;
-    }
-
-            // ===================================
             // COMPORTAMIENTO NORMAL
-            // ===================================
-            //
-            // Mientras existan 3 o más piezas,
-            // las que escapen demasiado lejos
-            // son eliminadas.
-            //
-            // ===================================
-
             if(
-
-                body.position.x <
-                -margen ||
-
-                body.position.x >
-                window.innerWidth +
-                margen ||
-
-                body.position.y <
-                -margen ||
-
-                body.position.y >
-                window.innerHeight +
-                margen
-
+                body.position.x < -margen ||
+                body.position.x > window.innerWidth + margen ||
+                body.position.y < -margen ||
+                body.position.y > window.innerHeight + margen
             ){
-
-                Composite.remove(
-                    physicsWorld,
-                    body
-                );
-
-                piezasDestruyendose.delete(
-                    body.id
-                );
-
+                Composite.remove(physicsWorld, body);
+                piezasDestruyendose.delete(body.id);
             }
-
         });
 
-            revisarFinDeFase();
+        revisarFinDeFase();
+    });
 
-        }
-    );
+    Composite.add(physicsWorld, [
+        Bodies.rectangle(window.innerWidth/2, -30, window.innerWidth, 60, {isStatic:true}),
+        Bodies.rectangle(window.innerWidth/2, window.innerHeight+30, window.innerWidth, 60, {isStatic:true}),
+        Bodies.rectangle(-30, window.innerHeight/2, 60, window.innerHeight, {isStatic:true}),
+        Bodies.rectangle(window.innerWidth+30, window.innerHeight/2, 60, window.innerHeight, {isStatic:true})
+    ]);
 
-    Composite.add(
-        physicsWorld,
-        [
+    const mouse = Mouse.create(matterRender.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+        mouse,
+        constraint:{ stiffness:0.2, render:{ visible:false } }
+    });
 
-            Bodies.rectangle(
-                window.innerWidth/2,
-                -30,
-                window.innerWidth,
-                60,
-                {isStatic:true}
-            ),
-
-            Bodies.rectangle(
-                window.innerWidth/2,
-                window.innerHeight+30,
-                window.innerWidth,
-                60,
-                {isStatic:true}
-            ),
-
-            Bodies.rectangle(
-                -30,
-                window.innerHeight/2,
-                60,
-                window.innerHeight,
-                {isStatic:true}
-            ),
-
-            Bodies.rectangle(
-                window.innerWidth+30,
-                window.innerHeight/2,
-                60,
-                window.innerHeight,
-                {isStatic:true}
-            )
-
-        ]
-    );
-
-    const mouse =
-        Mouse.create(
-            render.canvas
-        );
-
-    const mouseConstraint =
-        MouseConstraint.create(
-            engine,
-            {
-                mouse,
-                constraint:{
-                    stiffness:0.2,
-                    render:{
-                        visible:false
-                    }
-                }
-            }
-        );
-
-    Composite.add(
-        physicsWorld,
-        mouseConstraint
-    );
+    Composite.add(physicsWorld, mouseConstraint);
 
     let ultimoSpawn = 0;
     const intervaloSpawn = 100;
 
-    Events.on(
-        engine,
-        "collisionStart",
-        (event)=>{
+    Events.on(engine, "collisionStart", (event)=>{
+        const ahora = Date.now();
 
-            const ahora =
-                Date.now();
-
-            event.pairs.forEach(pair=>{
-
-                if(
-                    bola3D &&
-                    (
-                        pair.bodyA === bola3D ||
-                        pair.bodyB === bola3D
-                    )
-                ){
-
-                    const pieza =
-
-                        pair.bodyA === bola3D
-                        ? pair.bodyB
-                        : pair.bodyA;
-
-                    if(
-                        pieza !== bola3D &&
-                        !pieza.isStatic &&
-                        !piezasDestruyendose.has(
-                            pieza.id
-                        )
-                    ){
-
-                        destruirPiezaSuavemente(
-                            pieza
-                        );
-
-                    }
-
-                    return;
+        event.pairs.forEach(pair=>{
+            if(bola3D && (pair.bodyA === bola3D || pair.bodyB === bola3D)){
+                const pieza = pair.bodyA === bola3D ? pair.bodyB : pair.bodyA;
+                
+                if(pieza !== bola3D && !pieza.isStatic && !piezasDestruyendose.has(pieza.id)){
+                    destruirPiezaSuavemente(pieza);
                 }
+                return;
+            }
 
-                const a =
-                    pair.bodyA;
+            const a = pair.bodyA;
+            const b = pair.bodyB;
 
-                const b =
-                    pair.bodyB;
+            if(a === bola3D || b === bola3D) return;
+            if(a.isStatic || b.isStatic) return;
+            if(ahora - ultimoSpawn < intervaloSpawn) return;
 
-                if(
-                    a === bola3D ||
-                    b === bola3D
-                ){
-                    return;
-                }
+            const puntoColision = {
+                x: pair.collision.supports[0].x,
+                y: pair.collision.supports[0].y
+            };
 
-                if(
-                    a.isStatic ||
-                    b.isStatic
-                ){
-                    return;
-                }
-
-                if(
-                    ahora - ultimoSpawn <
-                    intervaloSpawn
-                ){
-                    return;
-                }
-
-                const puntoColision = {
-
-                    x:
-                        pair.collision
-                        .supports[0].x,
-
-                    y:
-                        pair.collision
-                        .supports[0].y
-
-                };
-
-                const cuerposDinamicos =
-
-                    Composite.allBodies(
-                        physicsWorld
-                    ).filter(
-                        body =>
-
-                            !body.isStatic &&
-                            body !== bola3D
-
-                    );
-
-                if(
-                    cuerposDinamicos.length <
-                    100 &&
-                    !bolaCreada
-                ){
-
-                    ultimoSpawn =
-                        ahora;
-
-                    crearPiezaMatter(
-
-                        puntoColision.x +
-                        (Math.random()-0.5)
-                        * 40,
-
-                        puntoColision.y +
-                        (Math.random()-0.5)
-                        * 40
-
-                    );
-
-                }
-                else if(
-                    !bolaCreada
-                ){
-
-                    bolaCreada = true;
-
-                    transicionAparicionBola();
-
-                }
-
-            });
-
-        }
-    );
-
-}
-
-function fadeOverlay(
-    color,
-    duracion = 150
-){
-
-    return new Promise(resolve=>{
-
-        const overlay =
-            document.getElementById(
-                "flashOverlay"
+            const cuerposDinamicos = Composite.allBodies(physicsWorld).filter(body =>
+                !body.isStatic && body !== bola3D
             );
 
-        overlay.style.transition =
-            "none";
+            if(cuerposDinamicos.length < 100 && !bolaCreada){
+                ultimoSpawn = ahora;
+                crearPiezaMatter(
+                    puntoColision.x + (Math.random()-0.5) * 40,
+                    puntoColision.y + (Math.random()-0.5) * 40
+                );
+            } else if(!bolaCreada){
+                bolaCreada = true;
+                transicionAparicionBola();
+            }
+        });
+    });
+}
 
-        overlay.style.background =
-            color;
-
-        overlay.style.opacity =
-            "1";
+function fadeOverlay(color, duracion = 150){
+    return new Promise(resolve=>{
+        const overlay = document.getElementById("flashOverlay");
+        overlay.style.transition = "none";
+        overlay.style.background = color;
+        overlay.style.opacity = "1";
 
         requestAnimationFrame(()=>{
-
-            overlay.style.transition =
-                `opacity ${duracion}ms ease`;
-
-            overlay.style.opacity =
-                "0.5";
-
+            overlay.style.transition = `opacity ${duracion}ms ease`;
+            overlay.style.opacity = "0.5";
             setTimeout(()=>{
-
-                overlay.style.opacity =
-                    "0";
-
-                setTimeout(
-                    resolve,
-                    duracion
-                );
-
+                overlay.style.opacity = "0";
+                setTimeout(resolve, duracion);
             },duracion);
-
         });
-
     });
-
 }
 
 async function transicionAparicionBola(){
-
-    await new Promise(
-        resolve => setTimeout(
-            resolve,
-            4000
-        )
-    );
-
-    await fadeOverlay(
-        "#000000",
-        180
-    );
-
-    await fadeOverlay(
-        "#ffffff",
-        180
-    );
-
+    await new Promise(resolve => setTimeout(resolve, 4000));
+    await fadeOverlay("#000000", 180);
+    await fadeOverlay("#ffffff", 180);
     mostrarBola3D();
-
 }
 
 function mostrarBola3D(){
-
     bolaCreada = true;
-
-    document
-        .getElementById(
-            "escena3d"
-        )
-        .style.display = "block";
+    document.getElementById("escena3d").style.display = "block";
 
     const radioBola = 120;
-
-bola3D =
-    Bodies.circle(
-
+    bola3D = Bodies.circle(
         window.innerWidth/2,
         window.innerHeight/2,
-
         radioBola,
-
         {
-
-                restitution:0.4,
-
-                friction:0,
-
-                frictionAir:0.005,
-
-                density:0.1,
-
-                render:{
-                    visible:false
-                }
-
-            }
-
-        );
-
-    Composite.add(
-        physicsWorld,
-        bola3D
+            restitution:0.4,
+            friction:0,
+            frictionAir:0.005,
+            density:0.1,
+            render:{ visible:false }
+        }
     );
 
-    Body.setMass(
-        bola3D,
-        5000
-    );
-
-    Body.setInertia(
-    bola3D,
-    Infinity
-);
+    Composite.add(physicsWorld, bola3D);
+    Body.setMass(bola3D, 5000);
+    Body.setInertia(bola3D, Infinity);
 }
 
 function destruirPiezaSuavemente(pieza){
+    if(piezasDestruyendose.has(pieza.id)){ return; }
 
-    if(
-        piezasDestruyendose.has(pieza.id)
-    ){
-        return;
-    }
+    piezasDestruyendose.add(pieza.id);
+    Body.setVelocity(pieza, {x:0, y:0});
+    Body.setAngularVelocity(pieza, 0);
+    Body.setStatic(pieza, true);
 
-    piezasDestruyendose.add(
-        pieza.id
-    );
-
-    Body.setVelocity(
-        pieza,
-        {
-            x:0,
-            y:0
-        }
-    );
-
-    Body.setAngularVelocity(
-        pieza,
-        0
-    );
-
-    Body.setStatic(
-        pieza,
-        true
-    );
-
-    pieza.render.sprite = {
-        xScale: 1,
-        yScale: 1
-    };
-
+    pieza.render.sprite = { xScale: 1, yScale: 1 };
     let pasos = 8;
 
-const animacion =
-    setInterval(()=>{
-
+    const animacion = setInterval(()=>{
         pasos--;
+        const progreso = 1 - (pasos / 8);
+        pieza.render.opacity = pasos / 8;
+        pieza.render.sprite.xScale = 1 + (progreso * 0.25);
+        pieza.render.sprite.yScale = 1 + (progreso * 0.25);
 
-        const progreso =
-            1 - (pasos / 8);
-
-        pieza.render.opacity =
-            pasos / 8;
-
-        pieza.render.sprite.xScale =
-            1 + (progreso * 0.25);
-
-        pieza.render.sprite.yScale =
-            1 + (progreso * 0.25);
-
-        if(
-            pasos <= 0
-        ){
-
-            clearInterval(
-                animacion
-            );
-
-            Composite.remove(
-                physicsWorld,
-                pieza
-            );
-
-            piezasDestruyendose.delete(
-                pieza.id
-            );
-
+        if(pasos <= 0){
+            clearInterval(animacion);
+            Composite.remove(physicsWorld, pieza);
+            piezasDestruyendose.delete(pieza.id);
             revisarFinDeFase();
-
         }
-
     },15);
-
 }
 
 function revisarFinDeFase(){
+    if(faseSiguienteIniciada){ return; }
 
-    if(
-        faseSiguienteIniciada
-    ){
-        return;
-    }
+    // SOLUCIÓN AL BUG PRINCIPAL: 
+    // Evita que la fase termine prematuramente si Matter.js 
+    // procesa un ciclo antes de insertar cuerpos dinámicos.
+    if(!bolaCreada || !bola3D){ return; }
 
-    const piezasRestantes =
+    const piezasRestantes = Composite.allBodies(physicsWorld).filter(body =>
+        body !== bola3D &&
+        !body.isStatic &&
+        !piezasDestruyendose.has(body.id)
+    );
 
-        Composite.allBodies(
-            physicsWorld
-        ).filter(body =>
-
-            body !== bola3D &&
-            !body.isStatic &&
-            !piezasDestruyendose.has(
-                body.id
-            )
-
-        );
-
-    if(
-        piezasRestantes.length === 0 &&
-        piezasDestruyendose.size === 0
-    ){
-
-        faseSiguienteIniciada =
-            true;
-
+    if(piezasRestantes.length === 0 && piezasDestruyendose.size === 0){
+        faseSiguienteIniciada = true;
         iniciarReinicio();
-
     }
-
 }
 
 function iniciarReinicio(){
-
-    if(reiniciando){
-        return;
-    }
-
+    if(reiniciando){ return; }
     reiniciando = true;
 
-    const escena =
-        document.getElementById(
-            "escena3d"
-        );
+    const escena = document.getElementById("escena3d");
+    document.body.style.transition = "background-color 1.8s ease";
+    document.body.style.backgroundColor = "#000";
 
-    // Fondo negro inmediatamente
-
-    document.body.style.transition =
-        "background-color 1.8s ease";
-
-    document.body.style.backgroundColor =
-        "#000";
-
-    // Bola gigante
-
-    escena.style.transition =
-        "transform 1.8s ease";
-
-    escena.style.transform =
-        "translate(-50%,-50%) scale(12)";
-
-    // Desaparece justo al terminar
+    escena.style.transition = "transform 1.8s ease";
+    escena.style.transform = "translate(-50%,-50%) scale(12)";
 
     setTimeout(()=>{
-
-        escena.style.display =
-            "none";
-
+        escena.style.display = "none";
+        container.style.display = "none";
         crearCirculoFinal();
-
     },1800);
-
 }
 
 function crearCirculoFinal(){
+    const circulo = document.createElement("div");
+    circulo.id = "circulo-reinicio";
 
-    const circulo =
-        document.createElement(
-            "div"
-        );
-
-    circulo.id =
-        "circulo-reinicio";
-
+    circulo.style.opacity = "1";
+    circulo.style.pointerEvents = "auto";
+    circulo.style.zIndex = "99999";
+    circulo.style.position = "fixed";
+    circulo.style.left = "50%";
+    circulo.style.top = "50%";
+    circulo.style.width = "350px";
+    circulo.style.height = "350px";
+    circulo.style.borderRadius = "50%";
+    circulo.style.background = "#ffffff";
+    circulo.style.transform = "translate(-50%,-50%)";
+    circulo.style.cursor = "pointer";
     circulo.style.opacity = "0";
 
-    document.body.appendChild(
-        circulo
-    );
+    document.body.appendChild(circulo);
 
     requestAnimationFrame(()=>{
-
-        circulo.style.transition =
-            "opacity 500ms ease";
-
-        circulo.style.opacity =
-            "1";
-
+        circulo.style.transition = "opacity 600ms ease";
+        circulo.style.opacity = "1";
     });
 
-    circulo.addEventListener(
-
-    "click",
-
-    ()=>{
-
-        circulo.classList.add(
-            "morph-hexagono"
-        );
-
+    circulo.addEventListener("click", ()=>{
+        circulo.style.opacity = "0";
         setTimeout(()=>{
-
-            location.reload();
-
-        },1200);
-
-    },
-
-    {once:true}
-
-);
-
+            circulo.remove();
+            mostrarHexagonoInicial();
+        },600);
+    }, {once:true});
 }
 
-function reiniciarExperiencia(
-    circulo
-){
-
-    if(
-        physicsWorld
-    ){
-
-        Composite.clear(
-            physicsWorld,
-            false
-        );
-
-    }
-
-    if(
-        engine
-    ){
-
-        Engine.clear(
-            engine
-        );
-
-    }
+function mostrarHexagonoInicial(){
+    // DETENER MATTER.JS POR COMPLETO
+    if(matterRunner){ Runner.stop(matterRunner); }
+    if(matterRender){ Render.stop(matterRender); }
+    if(engine){ Events.off(engine); Engine.clear(engine); }
+    if(physicsWorld){ Composite.clear(physicsWorld, false); }
 
     world.innerHTML = "";
-
     bola3D = null;
-
     bolaCreada = false;
-
     faseSiguienteIniciada = false;
-
     reiniciando = false;
-
     modoFinal = false;
-
     piezasDestruyendose.clear();
+    
+    // Activa la bandera para reiniciar el loop de polígonos
+    postReinicio = true;
 
+    document.body.style.backgroundColor = coloresFondo[3];
+    container.style.display = "block";
+    container.style.pointerEvents = "auto";
+    container.style.opacity = "0";
+    container.style.transition = "opacity 1200ms ease";
+
+    actualizarSVG(formas[3]);
+    shape.style.fill = "#ffffff";
+    formaActual = 3;
+
+    requestAnimationFrame(()=>{
+        container.style.opacity = "1";
+    });
+}
+
+function reiniciarExperiencia(circulo){
+    if(physicsWorld) Composite.clear(physicsWorld, false);
+    if(engine) Engine.clear(engine);
+
+    world.innerHTML = "";
+    bola3D = null;
+    bolaCreada = false;
+    faseSiguienteIniciada = false;
+    reiniciando = false;
+    modoFinal = false;
+    piezasDestruyendose.clear();
     formaActual = 0;
 
-    actualizarSVG(
-        formas[0]
-    );
-
-    cambiarColorFondo(
-        0
-    );
-
-    document.body.style.background =
-        coloresFondo[0];
-
-        document.body.style.transition =
-    "background-color 1.2s ease";
-
-    container.style.display =
-        "block";
-
-    const escena =
-        document.getElementById(
-            "escena3d"
-        );
-
-    escena.style.display =
-        "none";
-
-    escena.style.transform =
-        "translate(-50%,-50%)";
-
+    actualizarSVG(formas[0]);
+    cambiarColorFondo(0);
+    document.body.style.background = coloresFondo[0];
+    document.body.style.transition = "background-color 1.2s ease";
+    container.style.display = "block";
+    
+    const escena = document.getElementById("escena3d");
+    escena.style.display = "none";
+    escena.style.transform = "translate(-50%,-50%)";
     circulo.remove();
-
 }
 
 function activarModoFinal(){
-
     modoFinal = true;
-
-    document.body.style.backgroundColor =
-        "#ffffff";
-
-    container.style.display =
-        "none";
+    document.body.style.backgroundColor = "#ffffff";
+    container.style.display = "none";
 
     iniciarMatter();
 
-    crearPiezaMatter(
-        window.innerWidth * 0.4,
-        window.innerHeight * 0.5
-    );
-
-    crearPiezaMatter(
-        window.innerWidth * 0.6,
-        window.innerHeight * 0.5
-    );
-
+    crearPiezaMatter(window.innerWidth * 0.4, window.innerHeight * 0.5);
+    crearPiezaMatter(window.innerWidth * 0.6, window.innerHeight * 0.5);
 }
 
-container.addEventListener(
-    "click",
-    ()=>{
+container.addEventListener("click", ()=>{
+    if(modoFinal){ return; }
 
-        if(
-            modoFinal
-        ){
-            return;
-        }
-
-        let siguiente =
-            formaActual + 1;
-
-        if(
-            siguiente >= formas.length
-        ){
-
-            activarModoFinal();
-
-            return;
-
-        }
-
-        morph(
-            siguiente
-        );
-
-        cambiarColorFondo(
-            siguiente
-        );
-
+    // Si venimos del círculo final, el primer click reiniciará al Polígono #1
+    if(postReinicio){
+        postReinicio = false;
+        morph(0);
+        cambiarColorFondo(0);
+        return;
     }
-);
+
+    // Comportamiento normal (0 -> 1 -> 2 -> 3 -> Matter)
+    let siguiente = formaActual + 1;
+
+    if(siguiente >= formas.length){
+        activarModoFinal();
+        return;
+    }
+
+    morph(siguiente);
+    cambiarColorFondo(Math.min(siguiente, coloresFondo.length - 1));
+});
