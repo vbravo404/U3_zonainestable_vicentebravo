@@ -565,9 +565,32 @@ function activarModoFinal(){
     container.style.display = "none";
 
     iniciarMatter();
+    
+    // --- NUEVA LÍNEA AQUÍ ---
+    mostrarInstruccion();
 
     crearPiezaMatter(window.innerWidth * 0.4, window.innerHeight * 0.5);
     crearPiezaMatter(window.innerWidth * 0.6, window.innerHeight * 0.5);
+}
+
+function mostrarInstruccion() {
+    const div = document.createElement("div");
+    div.id = "instrucciones";
+    div.innerText = "¡HAZ COLISIONAR LAS PIEZAS!";
+    document.body.appendChild(div);
+
+    // Fade-in
+    setTimeout(() => div.style.opacity = "1", 100);
+
+    // Función para eliminarlo al primer click
+    const remover = () => {
+        div.style.opacity = "0";
+        setTimeout(() => div.remove(), 800);
+        window.removeEventListener("mousedown", remover);
+    };
+
+    // Escuchamos el primer click en cualquier parte de la ventana
+    window.addEventListener("mousedown", remover, {once: true});
 }
 
 container.addEventListener("click", ()=>{

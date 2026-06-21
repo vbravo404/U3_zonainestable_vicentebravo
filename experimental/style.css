@@ -135,3 +135,33 @@ svg{
     z-index:9999;
 
 }
+
+@font-face{
+
+    font-family:"ArgentumSans";
+    src:url("../fuentes/ArgentumSans-Bold.ttf")
+        format("truetype");
+
+    font-weight:700;
+    font-style:normal;
+}
+
+#instrucciones {
+    position: fixed;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    /* CAMBIO AQUÍ: */
+    font-family: 'ArgentumSans', sans-serif; 
+    font-weight: 700;
+    
+    font-size: 2rem;
+    color: #8c2041;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    text-align: center;
+    white-space: nowrap;
+}
