@@ -86,14 +86,16 @@
                 id="modelo-interactivo"
                 src="modelos/plataforma.glb" 
                 auto-rotate
-                style="cursor: pointer; width: 100%; height: 100%; outline: none;">
+                camera-orbit="0deg 75deg 80%"
+                bounds="tight"
+                style="cursor: pointer; width: 100%; max-width: 1200px; height: 100%; outline: none;" >
             </model-viewer>
-            <p style="text-align: center; color: #666; font-size: 0.9em; margin-top: 10px;">Haz clic sobre el modelo para cambiar la pieza</p>
+            <p style="text-align: center; color: #666; font-size: 0.9em; margin-top: 10px;">Haz clic sobre el modelo para modificar la estructura</p>
         </div>
     </div>
 
-    <div style="grid-column: 1 / -1; display: flex; justify-content: center; width: 100%; margin: 40px 0;">
-        <div class="galeria-simple" style="justify-content: center;">
+    <div class="bloque-galeria" style="grid-column: 1 / -1; display: flex; justify-content: center; width: 100%;">
+        <div class="galeria-simple" style="justify-content:center; width:1100px;">
             <img src="imagenes/prep3.gif" alt="Preparación 1">
             <img src="imagenes/prep1.gif" alt="Preparación 2">
             <img src="imagenes/prep2.gif" alt="Preparación 3">
@@ -131,7 +133,7 @@
     </div>
 
     <div style="grid-column: 1 / -1; display: flex; justify-content: center; width: 100%; margin: 40px 0;">
-        <div class="galeria-simple" style="justify-content: center;">
+        <div class="galeria-simple" style="justify-content:center; width:1100px;">
             <img src="imagenes/juego1.gif" alt="Juego 1">
             <img src="imagenes/juego2.gif" alt="Juego 2">
             <img src="imagenes/juego3.gif" alt="Juego 3">
@@ -158,7 +160,7 @@
             Para esta página exploratoria interactiva se ha tomado específicamente este aspecto de colisiones entre piezas, tomando <strong>polígonos planos como representaciones de los elementos
             físicos</strong>, como un rectángulo largo por el pilar, un hexágono por la plataforma, un rectángulo pequeño por la pieza común y un rectángulo con punta por la pieza especial, y
             junto a estos se ha decidido mantener la paleta de colores rosa, celeste, carmesí y amarillo para mantener todo en un orden de <strong>4 elementos diferentes que dialogan entre si
-            </strong>, 4 polígonos de 4 colores distintos que chocan entre si para hacer aparecer más y más polígonos. Y en contraste a esta <strong>cualidad de "creación"</strong> que se le ha impuesto a los
+            </strong>, 4 polígonos de 4 colores distintos que chocan entre si para hacer aparecer más y más polígonos. Y en contraste a esta <strong>cualidad "creadora"</strong> que se le ha impuesto a los
             polígonos coloridos, se ha agregado un elemento 3D esférico negro, que representa la bola de demolición de la herramienta en el juego físico, otorgándole a este elemento que rompe
             con la armonía de los 4 elementos anteriores de una <strong>característica "destructora"</strong>, pues se ingresa a la experiencia para deshacer todo lo generado entre los polígonos.
         </p>
@@ -168,12 +170,24 @@
             El objetivo es <strong>explorar las relaciones geométricas</strong> que se generan durante el juego a través de las <strong>interacciones físicas entre las piezas</strong>: los impactos,
             colisiones y choques, <strong>el agregar</strong> y <strong>el eliminar</strong> de los elementos.
         </p>
-        <a href="experimental/exploracion.html" class="boton-explorar">EXPLORAR LAS GEOMETRÍAS</a>
     </div>
 
-    <div class="image-column">
-        <div id="mini-matter-container"></div>
-    </div>
+    <div class="image-column image-column-centro">
+
+    <div id="mini-matter-container"></div>
+
+    <div class="separador-boton"></div>
+
+    <a
+        href="experimental/exploracion.html"
+        class="boton-explorar boton-explorar-derecha">
+
+        EXPLORAR LAS COLISIONES
+
+    </a>
+
+</div>
+</div>
 
     <div class="image-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: center; width: 100%; margin: 40px 0;">
     <img src="imagenes/PIX.png" alt="Partitura de Interacción Exploración de Geometrías" style="max-width: 80%; height: auto; border-radius: 8px;">

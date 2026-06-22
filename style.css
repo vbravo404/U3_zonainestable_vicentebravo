@@ -134,17 +134,19 @@ html{
     font-family:"Marola", serif;
 
     font-size:clamp(
-        4rem,
-        10vw,
-        9rem
+        5rem,
+        11vw,
+        10rem
     );
 
     line-height:.85;
-
     color:#8c2041;
-
     margin:0;
 
+}
+
+p{
+    font-size:17px;
 }
 
 .hero p{
@@ -780,7 +782,7 @@ nav a.active::after{
 .boton-wiki{
 
     width:max-content;
-    margin:25px auto 0 auto;
+    margin:2px auto 0 auto;
     align-items:center;
     justify-content:center;
     padding:7px 5px;
@@ -875,4 +877,62 @@ model-viewer {
 
 #modelo-interactivo:hover {
     cursor: url("imagenes/cursor-hover.png") 0 0, auto !important;
+}
+
+/* =========================
+ESPACIADO DE GALERÍAS
+========================= */
+
+.bloque-galeria{
+
+    margin-top:10px;
+
+    margin-bottom:100px;
+
+}
+
+/* =========================
+BOTÓN EXPLORAR DERECHA
+========================= */
+
+.boton-explorar-derecha{
+
+    display:flex;
+
+    width:446px;
+
+    margin-top:300px;   /* separación respecto al Matter.js */
+
+    margin-left:auto;
+    margin-right:auto; /* centrado horizontal */
+
+}
+/* =========================
+BOTÓN MÁS GRANDE
+========================= */
+
+.boton-explorar{
+
+    padding:22px 50px;
+
+    font-size:1.25rem;
+
+    letter-spacing:0.12em;
+
+}
+
+.image-column-centro{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+.separador-boton{
+
+    height:0.1px;
+
 }
