@@ -1,26 +1,17 @@
-<!-- profundizar en el fundamento y el todo el texto del landing // añicos y generación a partir de los trozos
-  // agregar indicación de hacer chocar las piezas para dejar clara la interacción // arreglar condiciones del viewport
-  //resolver inicio y final // agregar PIX // al finalizar cerrar el ciclo de interacción y en vez de dejar en
-  blanco la pantalla, volver a las contraformas y reiniciar el proceso- // documentar todo XD-->
+<!--  añicos y generación a partir de los trozos // documentar todo XD-->
 
 
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Geometrías Inestables</title>
-
+    
     <link rel="stylesheet" href="style.css">
 
-    <script
-    type="module"
-    src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
-    </script>
-
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 </head>
 
 <body>
@@ -28,170 +19,188 @@
 <div id="background-pieces"></div>
 
 <header>
-
-    <a
-    href="#hero"
-    class="logo">
-
-        GEOMETRÍAS INESTABLES
-
-    </a>
-
+    <a href="#hero" class="logo">GEOMETRÍAS INESTABLES</a>
     <nav>
-
-        <a href="#proyecto">
-            SOBRE EL PROYECTO
-        </a>
-
-        <a href="#geometrias">
-            LAS GEOMETRÍAS
-        </a>
-
-        <a href="experimental/exploracion.html">
-            EXPLORA
-        </a>
-
+        <a href="#proyecto">SOBRE EL PROYECTO</a>
+        <a href="#geometrias">LAS GEOMETRÍAS</a>
+        <a href="experimental/exploracion.html">EXPLORA</a>
     </nav>
-
 </header>
 
 <section id="hero" class="hero">
+    <img src="imagenes/gifhero.gif" class="hero-gif" alt="Geometrías Inestables">
+    <div class="hero-overlay">
+        <h1>GEOMETRÍAS<br>INESTABLES</h1>
+        <p>
+            </p>
+        <div class="hero-nav">
+            <a href="#proyecto">SOBRE EL PROYECTO</a>
+            <a href="#geometrias">LAS GEOMETRÍAS</a>
+            <a href="experimental/exploracion.html">EXPLORA</a>
+        </div>
+    </div>
+</section>
 
-    <img
-        src="imagenes/gifhero.gif"
-        class="hero-gif"
-        alt="Geometrías Inestables">
+<section id="proyecto" class="section">
 
-     <div class="hero-overlay">
-
-    <h1>
-
-        GEOMETRÍAS
-        <br>
-        INESTABLES
-
-    </h1>
-
-    <p>
-
-        <!-- Un estudio visual sobre forma,
-        transformación, movimiento e interacción.-->
-
-    </p>
-
-    <div class="hero-nav">
-
-        <a href="#proyecto">
-            SOBRE EL PROYECTO
-        </a>
-
-        <a href="#geometrias">
-            LAS GEOMETRÍAS
-        </a>
-
-        <a href="experimental/exploracion.html">
-            EXPLORA
-        </a>
-
+    <div class="text-column">
+        <div class="titulo-bloque izquierda">
+            <h2>SOBRE ESTE PROYECTO</h2>
+        </div>
+        <p>
+            Geometrías Inestables nace en el Taller de Diseño de Interacción 2026, donde se diseñó el juego de mesa "<strong>Zona Inestable</strong>", un juego diseñado para
+            <strong>crear tensión</strong> en los jugadores durante sus diferentes fases de juego, desde el cuidadoso ensamblado de la estructura y colocación de sus piezas para
+            no botar la estructura al momento de armarla, y el posterior derribo de las piezas con las herramientas, con la precaución de no provocar el derrumbe de las plataformas y la estructura.
+        </p>
     </div>
 
-</div>
+    <div class="modelo-3d" style="display: flex; justify-content: center; align-items: flex-start;">
+        <model-viewer 
+            src="modelos/CAJA.glb" 
+            auto-rotate 
+            rotation-per-second="60deg"
+            bounds="tight"
+            camera-orbit="auto auto 90%"
+            style="width: 100%; max-width: 750px; height: 400px; outline: none;">
+        </model-viewer>
+    </div>
+
+    <div class="text-column" style="margin-top: 40px;">
+        <h3>Preparación del Escenario de juego</h3>
+        <p>
+            Durante la primera fase del juego, los jugadores deberán ensamblar cada plataforma, uniendo la superficie hexagonal al pilar de soporte, y el pilar a la base circular.
+            Es posible armar <strong>hasta 7 plataformas</strong>, poniéndolas todas al mismo nivel, o colocando algunas sobre otras, dando así la <strong>libertad a los jugadores
+            de elegir ellos mismos la estructura en la que jugarán</strong>. Dependiendo de la estructura que los jugadores elijan construir, el juego posterior variará su dificultad.
+        </p>
+        <p>
+            Una vez lista la estructura, los jugadores deberán colocar sobre las plataformas las distintas piezas de color disponible, habiendo un total de <strong>32 piezas normales</strong>
+            (8 de cada color) y <strong>8 piezas especiales</strong> (2 de cada color).
+            Las piezas especiales, al esperarse que sean más difícil de conseguir, deberán ser colocadas más cerca
+            del centro que las piezas normales. Cuando todas las piezas de colores estén colocadas sobre la estructura, los jugadores deberán sortear el color que le tocará a cada uno.
+        </p>
+    </div>
+
+    <div class="modelo-3d" style="display: flex; align-items: center; margin-top: 40px;">
+        <div class="contenedor-modelo" style="height: 400px; width: 100%;">
+            <model-viewer 
+                id="modelo-interactivo"
+                src="modelos/plataforma.glb" 
+                auto-rotate
+                style="cursor: pointer; width: 100%; height: 100%; outline: none;">
+            </model-viewer>
+            <p style="text-align: center; color: #666; font-size: 0.9em; margin-top: 10px;">Haz clic sobre el modelo para cambiar la pieza</p>
+        </div>
+    </div>
+
+    <div style="grid-column: 1 / -1; display: flex; justify-content: center; width: 100%; margin: 40px 0;">
+        <div class="galeria-simple" style="justify-content: center;">
+            <img src="imagenes/prep3.gif" alt="Preparación 1">
+            <img src="imagenes/prep1.gif" alt="Preparación 2">
+            <img src="imagenes/prep2.gif" alt="Preparación 3">
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <div class="text-column">
+        <h3>Hora del Juego</h3>
+        <p>
+            Al iniciar su turno, cada jugador deberá girar una ruleta que le indicará con qué mano y con qué herramienta deberá jugar.
+        </p>
+        <p>
+            El objetivo del jugador será <strong>derribar las piezas</strong> que no sean del color que le haya tocado, donde una pieza normal vale 1 punto y una pieza especial vale 2, y deberá hacerlo <strong>con el cuidado de no botar las plataformas de la estructura</strong>, pues eso le significará la descalificación del juego.
+        </p>
+        <p>
+            Al finalizar el juego, se hará el recuento de las piezas totales de todos los jugadores, descontando de su puntaje las piezas que hayan derribado que sean de su color propio.
+            <strong>El jugador con mayor puntaje será declarado el ganador de la partida</strong>.
+        </p>
+    </div>
+
+    <div class="modelo-3d" style="display: flex; justify-content: center; align-items: center;">
+        <model-viewer 
+            src="modelos/plathor.glb" 
+            auto-rotate
+            bounds="tight"
+            camera-orbit="auto auto 90%"
+            style="width: 100%; max-width: 500px; height: 500px; outline: none;">
+        </model-viewer>
+    </div>
+
+    <div style="grid-column: 1 / -1; display: flex; justify-content: center; width: 100%; margin: 40px 0;">
+        <div class="galeria-simple" style="justify-content: center;">
+            <img src="imagenes/juego1.gif" alt="Juego 1">
+            <img src="imagenes/juego2.gif" alt="Juego 2">
+            <img src="imagenes/juego3.gif" alt="Juego 3">
+        </div>
+    </div>
 
 </section>
 
-
-
-<section
-id="proyecto"
-class="section">
-
+<section id="geometrias" class="section">
     <div class="text-column">
-
-    <div class="titulo-bloque izquierda">
-
-        <h2>
-            SOBRE ESTE PROYECTO
-        </h2>
-
+        <div class="titulo-bloque izquierda">
+            <h2>LAS GEOMETRÍAS</h2>
+        </div>
+        <p>
+            Uno de los aspectos más importantes y esenciales en Zona Inestable es el <strong>contacto directo</strong> entre las distintas piezas del juego, como el contacto entre
+            las partes ensambladas de la estructura, y el contacto que debe realizar el jugador con la caña para derribar las piezas de las plataformas, pues de la única forma en el que un
+            turno será contado como válido, será si el jugador logra impactar alguna pieza con la herramienta, independiente de si la pieza es derribada fuera de la estructura o no.
+        </p>
+        <p>
+            Para esta página exploratoria interactiva se ha tomado específicamente este aspecto de colisiones entre piezas, tomando <strong>polígonos planos como representaciones de los elementos
+            físicos</strong>, como un rectángulo largo por el pilar, un hexágono por la plataforma, un rectángulo pequeño por la pieza común y un rectángulo con punta por la pieza especial, y
+            junto a estos se ha decidido mantener la paleta de colores rosa, celeste, carmesí y amarillo para mantener todo en un orden de <strong>4 elementos diferentes que dialogan entre si
+            </strong>, 4 polígonos de 4 colores distintos que chocan entre si para hacer aparecer más y más polígonos. Y en contraste a esta <strong>cualidad de "creación"</strong> que se le ha impuesto a los
+            polígonos coloridos, se ha agregado un elemento 3D esférico negro, que representa la bola de demolición de la herramienta en el juego físico, otorgándole a este elemento que rompe
+            con la armonía de los 4 elementos anteriores de una <strong>característica "destructora"</strong>, pues se ingresa a la experiencia para deshacer todo lo generado entre los polígonos.
+        </p>
+        <p>
+            Desde el flujo de juego original se toma la fase de ensamblado de la estructura y colocación de piezas, y derribo de piezas y destrucción de la estructura, para traspasarlo a
+            la experiencia digital a través de una <strong>constante colisión de elementos poligonales y de contrastes de colores y formas</strong>.
+            El objetivo es <strong>explorar las relaciones geométricas</strong> que se generan durante el juego a través de las <strong>interacciones físicas entre las piezas</strong>: los impactos,
+            colisiones y choques, <strong>el agregar</strong> y <strong>el eliminar</strong> de los elementos.
+        </p>
+        <a href="experimental/exploracion.html" class="boton-explorar">EXPLORAR LAS GEOMETRÍAS</a>
     </div>
-
-    <p>
-        Geometrías Inestables nace en el Taller de Diseño de Interacción 2026, donde se diseñó el juego de mesa "<strong>Zona Inestable</strong>".
-    </p>
-    <p>
-        El juego consiste en 2 fases: la primera de preparación, en donde un máximo de 4 jugadores arman hasta 7 plataformas de la forma que estos deseen y colocan en ellas
-        piezas de distintos colores, las cuales, en la siguiente fase, deberán derribar con cuidado de no botar las de su propio color.
-    </p>
-    <p>
-        La caja del juego contiene 7 plataformas hexagonales, 7 bases circulares, 7 pilares de madera, 2 cañas extendibles, 1 bola pesada negra, 1 bola ligera blanca, 1 ruleta de condiciones y
-        32 piezas normales de distintos colores (8 por cada color), 8 piezas especiales de distintos colores (2 por cada color).
-
-    </p>
-
-</div>
-
-    <div class="modelo-3d">
-
-    <model-viewer
-        src="modelos/plataforma.glb"
-        auto-rotate>
-    </model-viewer>
-
-</div>
-
-</section>
-
-<section
-id="geometrias"
-class="section">
-
-    <div class="text-column">
-
-    <div class="titulo-bloque izquierda">
-
-        <h2>
-            LAS GEOMETRÍAS
-        </h2>
-
-    </div>
-
-    <p>
-    Tomando en cuenta el aspecto del <strong>contacto directo entre elementos físicos</strong> en Zona Inestable, para esta página
-    interactiva se eligió profundizar y jugar con las <strong>particularidades geométricas</strong> del juego de mesa,
-    pensando en el hecho de tener polígonos tridimensionales como prismas rectangulares, hexagonales y prismas 
-    irregulares como las piezas especiales.
-    </p>
-    <p>
-    El objetivo es <strong>explorar las interacciones geométricas</strong> como relaciones de forma, contactos, impactos y choques.
-    </p>
-
-    <a
-    href="experimental/exploracion.html"
-    class="boton-explorar">
-
-    EXPLORAR LAS GEOMETRÍAS
-
-    </a>
-
-</div>
 
     <div class="image-column">
-
         <div id="mini-matter-container"></div>
-
     </div>
 
+    <div class="image-wrapper" style="grid-column: 1 / -1; display: flex; justify-content: center; width: 100%; margin: 40px 0;">
+    <img src="imagenes/PIX.png" alt="Partitura de Interacción Exploración de Geometrías" style="max-width: 80%; height: auto; border-radius: 8px;">
+</div>
 </section>
 
 <footer>
-
     Geometrías Inestables · Vicente Bravo Castañeda · EAD-TDIX2026
-
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
 <script src="script.js"></script>
 
-</body>
+<script>
+    // Lógica para cambiar modelos 3D al hacer clic
+    const listaModelos = [
+        "modelos/plataforma.glb",
+        "modelos/plataforma2.glb",
+        "modelos/plataforma3.glb",
+        "modelos/plataforma4.glb",
+        "modelos/plataforma5.glb",
+    ];
+    let indiceModelo = 0;
 
+    const modeloInteractivo = document.getElementById('modelo-interactivo');
+
+    if(modeloInteractivo) {
+        modeloInteractivo.addEventListener('click', () => {
+            indiceModelo = (indiceModelo + 1) % listaModelos.length;
+            modeloInteractivo.src = listaModelos[indiceModelo];
+        });
+    }
+</script>
+
+</body>
 </html>

@@ -713,15 +713,28 @@ nav a.active::after{
 
 }
 
-.modelo-3d{
+/* Columna derecha completa */
+.modelo-3d {
+    grid-column: 8 / span 4;
+    width: 100%;
+    height: auto; /* Quitamos el 450px fijo para que la columna pueda crecer */
+}
 
-    grid-column:
-        8 / span 4;
+/* El visor del modelo en sí */
+.modelo-3d model-viewer {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    outline: none;
+}
 
-    width:100%;
-
-    height:450px;
-
+/* Contenedor de cada modelo y su instrucción */
+.contenedor-modelo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 400px; /* ¡Esta es la clave! Le damos una altura fija para que el modelo sepa cuánto debe crecer */
 }
 
 .modelo-3d model-viewer{
@@ -806,4 +819,42 @@ nav a.active::after{
 
     outline:none !important;
 
+}
+
+/* Esto asegura que la galería ocupe casi todo el ancho disponible */
+.galeria-simple {
+    display: flex;
+    justify-content: center; /* Centra las imágenes */
+    align-items: center;
+    gap: 40px; /* Aumenta la separación entre los 3 elementos */
+    width: 100%;
+    max-width: 1200px; /* Ajusta este valor si quieres que sea aún más ancha */
+    margin: 0 auto;
+}
+
+/* Esto controla el tamaño de las imágenes dentro de la galería */
+.galeria-simple img {
+    width: 30%; /* Cada imagen ocupará el 30% del ancho, total 90% + gaps */
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px; /* Opcional: para que se vean más estéticas */
+    transition: transform 0.3s ease;
+}
+
+.instruccion-modelo {
+    font-family: 'ArgentumSans', sans-serif; /* Usa tu tipografía */
+    font-size: 0.8rem;
+    color: #8c2041;
+    margin-top: 10px;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* Aplicamos el cursor hover a cualquier model-viewer que sea interactivo */
+model-viewer {
+    cursor: url("imagenes/cursor-normal.png") 0 0, auto;
+}
+
+#modelo-interactivo:hover {
+    cursor: url("imagenes/cursor-hover.png") 0 0, auto !important;
 }
